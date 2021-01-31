@@ -1,0 +1,41 @@
+{
+  "name": "rollylni/vklib",
+  "description": "library for simplified work with VK-API",
+  "version": "0.7.0",
+  "type": "library",
+  "keywords": ["vk-api", "php", "sdk"],
+  "time": "2020-12-08 23:34:06",
+  "license": "MIT",
+
+  "authors": [{
+    "name": "Faruch N.",
+    "email": "rollyllni@gmail.com",
+    "homepage": "https://vk.com/rollylni",
+    "role": "Developer"
+  }],
+
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "ext-ctype": "*",
+    "rollylni/triggers": "0.0.3",
+    "guzzlehttp/guzzle": ">=7.0.0",
+    "workerman/workerman": ">=4.0.0"
+  },
+  
+  "require-dev": {
+    "phpunit/phpunit": ">=8.2.0"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "VkLib\\": "lib/"
+    }
+  },
+  
+  "autoload-dev": {
+    "psr-4": {
+      "VkLib\\Tests": "tests/"
+    }
+  }
+}
