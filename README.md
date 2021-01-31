@@ -6,6 +6,7 @@
 [![PHPVersion](https://img.shields.io/packagist/php-v/rollylni/vklib?style=plastic)](https://packagist.org/packages/rollylni/vklib)
 
 VkLib is a library for simplified work with the VK API in the OOP style.
+
 full documentation coming soon...
 
 ## Installation
