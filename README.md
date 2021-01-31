@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/packagist/v/rollylni/vklib?style=plastic)](https://packagist.org/packages/rollylni/vklib)
 [![Downloads](https://img.shields.io/packagist/dt/rollylni/vklib?style=plastic)](https://packagist.org/packages/rollylni/vklib)
 [![License](https://img.shields.io/packagist/l/rollylni/vklib?style=plastic)](https://en.wikipedia.org/wiki/MIT_License)
-[![PHP Version](https://img.shields.io/packagist/php-v/rollylni/vklib?style=plastic)](https://www.php.net/manual/en/index.php)
+[![PHPVersion](https://img.shields.io/packagist/php-v/rollylni/vklib?style=plastic)](https://www.php.net/manual/en/index.php)
 
 VkLib is a library for simplified work with the VK API in the OOP style.
 
