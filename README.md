@@ -29,6 +29,7 @@ composer require rollylni/vklib
   * Manage group callback servers
   * The ability to process payments
   * Uploading files to the VK server
+  * Streaming
   * Widgets
   
 ## Example Usage
