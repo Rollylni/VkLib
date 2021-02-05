@@ -57,10 +57,14 @@ class Response {
         if (substr($method, 0, 3) === "get") {
             $offset = $args[0] ?? null;
             $param = VkMethod::formatParameter(substr($method, 3));
+            $json = $this->json();
             if ($offset !== null) {
-                return $this->json()[$offset][$param] ?? null;
+                if (isset($json["items"])) {
+                    $json = $json["items"];
+                }
+                return $json[$offset][$param] ?? null;
             }
-            return $this->json()[$param] ?? null;
+            return $json[$param] ?? null;
         }
     }
     
