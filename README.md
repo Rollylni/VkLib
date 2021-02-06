@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/packagist/l/rollylni/vklib?style=plastic)](https://en.wikipedia.org/wiki/MIT_License)
 [![PHPVersion](https://img.shields.io/packagist/php-v/rollylni/vklib?style=plastic)](https://packagist.org/packages/rollylni/vklib)
 
-VkLib is a library for simplified work with the VK API in the OOP style.
+VkLib is a library for simplified work with the VK API in the OOP approach.
 
 full documentation coming soon...
 
