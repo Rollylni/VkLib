@@ -31,7 +31,7 @@ class VkApi {
      * @link https://vk.com/dev/versions
      * @var float
      */
-    public const CURRENT_VERSION = 5.126;
+    public const CURRENT_VERSION = 5.130;
 
     /**
      *
