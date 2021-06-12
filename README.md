@@ -15,7 +15,7 @@ composer require rollylni/vklib
 ## Capabilities
   * Ability to create many clients [(Example)](./docs/Clients.md)
   * Сonvenient call API requests [(Example)](./docs/Methods.md)
-  * Captcha handling capability [(Example)](.docs/Methods.md)
+  * Captcha handling capability [(Example)](./docs/Methods.md)
   * Keyboard support for bots [(Example)](./docs/Keyboard.md)
   * Callback buttons supported [(Example)](./docs/Keyboard.md)
   * Button click handlers for bots [(Example)](./docs/Keyboard.md)
