@@ -19,9 +19,6 @@
  */
 namespace VkLib\Payment;
 
-/**
- * @internal
- */
 interface PaymentResponse {
     
     /**

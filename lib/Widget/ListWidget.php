@@ -35,10 +35,10 @@ class ListWidget extends Widget {
     
     /**
      * 
-     * @param ListRow $row
+     * @param ListRow|array $row
      */
-    public function addRow(ListRow $row) {
-        $this->body["rows"][] = $row->getContent();
+    public function addRow($row): self {
+        $this->body["rows"][] = $this->getContent($row);
         return $this;
     }
 }

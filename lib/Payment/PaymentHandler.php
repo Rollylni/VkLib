@@ -43,7 +43,7 @@ abstract class PaymentHandler {
      * @param string $secretKey
      * @param bool $headers
      */
-    public function __construct($secretKey, bool $headers = true) {
+    public function __construct(string $secretKey, bool $headers = true) {
         if ($headers) {
             $this->setHeaders();
         }
@@ -60,7 +60,7 @@ abstract class PaymentHandler {
      * 
      * @param array $data
      */
-    public function handleData(array $data = []) {
+    public function handleData(array $data = []): void {
         if ($data === []) {
             $data = $this->readData();
         }
@@ -92,45 +92,45 @@ abstract class PaymentHandler {
     /**
      * 
      * @param PaymentNotification $nf
-     * @return PaymentResponse
+     * @return PaymentResponse|array
      */
-    public function handleTest(PaymentNotification $nf): PaymentResponse {
-        return new PaymentError(PaymentError::COMMON_ERROR, "test mode not processed!", true);
+    public function handleTest(PaymentNotification $nf) {
+        return new PaymentError(PaymentError::COMMON_ERROR, "test mode not processed!", false);
     }
     
     /**
      * 
      * @param GetItemNotification $nf
-     * @return PaymentResponse
+     * @return PaymentResponse|array
      */
-    public function get_item(GetItemNotification $nf): PaymentResponse {
+    public function get_item(GetItemNotification $nf) {
         return $nf;
     }
     
     /**
      * 
      * @param GetSubscriptionNotification $nf
-     * @return PaymentResponse
+     * @return PaymentResponse|array
      */
-    public function get_subscription(GetSubscriptionNotification $nf): PaymentResponse {
+    public function get_subscription(GetSubscriptionNotification $nf) {
         return $nf;
     }
     
     /**
      * 
      * @param OrderStatusChangeNotification $nf
-     * @return PaymentResponse
+     * @return PaymentResponse|array
      */
-    public function order_status_change(OrderStatusChangeNotification $nf): PaymentResponse {
+    public function order_status_change(OrderStatusChangeNotification $nf) {
         return $nf;
     }
     
     /**
      * 
      * @param SubscriptionStatusChangeNotification $nf
-     * @return PaymentResponse
+     * @return PaymentResponse|array
      */
-    public function subscription_status_change(SubscriptionStatusChangeNotification $nf): PaymentResponse {
+    public function subscription_status_change(SubscriptionStatusChangeNotification $nf) {
         return $nf;
     }
     
@@ -141,7 +141,7 @@ abstract class PaymentHandler {
      * @param string $secretKey
      * @return bool
      */
-    public static function checkSig(array $data, $secretKey) {
+    public static function checkSig(array $data, string $secretKey): bool {
         $sig = $data["sig"];
         unset($data["sig"]);
         ksort($data);
@@ -156,7 +156,7 @@ abstract class PaymentHandler {
      * 
      * @param array|PaymentResponse $data
      */
-    public static function writeData($data) {
+    public static function writeData($data): void {
         if ($data instanceof PaymentResponse) {
             $data = $data->getBody();
         }
@@ -171,7 +171,7 @@ abstract class PaymentHandler {
         return json_decode(file_get_contents("php://input"), true);
     }
     
-    public static function setHeaders() {
+    public static function setHeaders(): void {
         header("Content-Type: application/json; encoding=utf-8");
     }
 }

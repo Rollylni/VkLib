@@ -35,11 +35,10 @@ class DonationWidget extends Widget {
     
     /**
      * 
-     * @override
      * @param string $title
      * @param string $buttonUrl
      */
-    public function __construct($title, $buttonUrl) {
+    public function __construct(string $title, string $buttonUrl) {
         parent::__construct($title);
         $this->setButtonUrl($buttonUrl);
     }
@@ -48,7 +47,7 @@ class DonationWidget extends Widget {
      * 
      * @param string $text
      */
-    public function setText($text) {
+    public function setText(string $text): self {
         $this->body["text"] = $text;
         return $this;
     }
@@ -57,7 +56,7 @@ class DonationWidget extends Widget {
      * 
      * @param string $url
      */
-    public function setTextUrl($url) {
+    public function setTextUrl(string $url): self {
         $this->body["text_url"] = $url;
         return $this;
     }
@@ -66,7 +65,7 @@ class DonationWidget extends Widget {
      * 
      * @param string $url
      */
-    public function setButtonUrl($url) {
+    public function setButtonUrl(string $url): self {
         $this->body["button_url"] = $url;
         return $this;
     }
@@ -76,7 +75,7 @@ class DonationWidget extends Widget {
      * @param string $start
      * @param string $end
      */
-    public function setDate($start = "now", $end = "+7 days") {
+    public function setDate(string $start = "now", string $end = "+7 days"): self {
         $this->body["date"] = [
             "start" => strtotime($start),
             "end" => strtotime($end)
@@ -88,7 +87,7 @@ class DonationWidget extends Widget {
      * 
      * @param int $goal
      */
-    public function setGoal($goal) {
+    public function setGoal(int $goal): self {
         $this->body["goal"] = $goal;
         return $this;
     }
@@ -97,7 +96,7 @@ class DonationWidget extends Widget {
      * 
      * @param int $funded
      */
-    public function setFunded($funded) {
+    public function setFunded(int $funded): self {
         $this->body["funded"] = $funded;
         return $this;
     }
@@ -106,7 +105,7 @@ class DonationWidget extends Widget {
      * 
      * @param int $backers
      */
-    public function setBackers($backers) {
+    public function setBackers(int $backers): self {
         $this->body["backers"] = $backers;
         return $this;
     }
@@ -115,7 +114,7 @@ class DonationWidget extends Widget {
      * 
      * @param string $currency
      */
-    public function setCurrency($currency) {
+    public function setCurrency(string $currency): self {
         $this->body["currency"] = $currency;
         return $this;
     }

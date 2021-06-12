@@ -32,7 +32,7 @@ class AppImage extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->imageType) {
             $params["image_type"] = $this->imageType;
         }
@@ -44,7 +44,7 @@ class AppImage extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->appWidgets->saveAppImage($params)->json();
     }
     
@@ -63,7 +63,7 @@ class AppImage extends Upload {
      * 
      * @param string $type
      */
-    public function setImageType($type) {
+    public function setImageType(string $type): self {
         $this->imageType = $type;
         return $this;
     }
@@ -72,7 +72,7 @@ class AppImage extends Upload {
      * 
      * @param string $src
      */
-    public function setImage($src) {
+    public function setImage(string $src): self {
         return $this->addFile($src);
     }
 }

@@ -50,7 +50,7 @@ class PhotoChat extends Upload {
      * @param array $params
      * @return array 
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->chatId) {
             $params["chat_id"] = $this->chatId;
         } if ($this->cropX !== null) {
@@ -68,7 +68,7 @@ class PhotoChat extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->messages->setChatPhoto($params)->json();
     }
     
@@ -85,9 +85,9 @@ class PhotoChat extends Upload {
     
     /**
      * 
-     * @param string $id
+     * @param int $id
      */
-    public function setChatId($id) {
+    public function setChatId(int $id): self {
         $this->chatId = $id;
         return $this;
     }
@@ -98,7 +98,7 @@ class PhotoChat extends Upload {
      * @param int $y
      * @param int $width
      */
-    public function setCrop($x, $y, $width) {
+    public function setCrop(int $x, int $y, int $width): self {
         $this->cropX = $x;
         $this->cropY = $y;
         $this->cropWidth = $width;
@@ -109,7 +109,7 @@ class PhotoChat extends Upload {
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

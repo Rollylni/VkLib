@@ -19,12 +19,12 @@
  */
 namespace VkLib\Method;
 
-use Closure;
 use function is_callable;
 use function file_get_contents;
 use function file_put_contents;
 
 class Captcha {
+    
     /**
      *
      * @var string
@@ -53,10 +53,10 @@ class Captcha {
      * Captcha constructor.
      *
      * @param VkMethod $method
-     * @param string $sid
-     * @param string $img
+     * @param string|null $sid
+     * @param string|null $img
      */
-    public function __construct(VkMethod $method, $sid, $img) {
+    public function __construct(VkMethod $method, ?string $sid, ?string $img) {
         $this->method = $method;
         $this->sid = $sid;
         $this->img = $img;
@@ -66,7 +66,7 @@ class Captcha {
      *
      * @param string $patch
      */
-    public function saveImage($patch) {
+    public function saveImage($patch): void {
         file_put_contents($patch, file_get_contents($this->getImage()));
     }
 
@@ -76,7 +76,7 @@ class Captcha {
      * @see VkMethod::__call()
      * @return VkMethod
      */
-    public function input($captcha) {
+    public function input($captcha): VkMethod {
         return $this->getMethod()->setCaptchaSid($this->getSid())->setCaptchaKey($captcha);
     }
 
@@ -100,7 +100,7 @@ class Captcha {
      * 
      * @return VkMethod
      */
-    public function getMethod() {
+    public function getMethod(): VkMethod {
         return $this->method;
     }
     
@@ -109,13 +109,18 @@ class Captcha {
      * @internal
      * @uses VkMethod::call()
      * @param Captcha $cap
+     * @return bool
      */
-    public static function handle(Captcha $cap) {
+    public static function handle(Captcha $cap): bool {
+        $handled = false;
         foreach (static::$handlers as $handler) {
-            if ($handler instanceof Closure) {
-                $handler($cap);
+            if (is_callable($handler)) {
+                if ($handler($cap) === true) {
+                    $handled = true;
+                }
             }
         }
+        return $handled;
     }
     
     /**
@@ -123,10 +128,7 @@ class Captcha {
      * @api
      * @param Closure|callable $handler
      */
-    public static function setHandler($handler) {
-        if (is_callable($handler)) {
-            $handler = Closure::fromCallable($handler);
-        }
+    public static function setHandler($handler): void {
         static::$handlers[] = $handler;
     }
 }

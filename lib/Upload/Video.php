@@ -26,7 +26,7 @@ class Video extends Upload {
      * @param array $params
      * @return array 
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         return $this->getClient()->getApi()->video->save($params)->json();
     }
     
@@ -44,7 +44,7 @@ class Video extends Upload {
      * 
      * @param string $src
      */
-    public function setVideo($src) {
+    public function setVideo(string $src): self {
         return $this->addFile($src);
     }
 }

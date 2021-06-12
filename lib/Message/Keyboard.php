@@ -32,8 +32,6 @@ use function substr;
 use function count;
 use function key;
 
-use Closure;
-
 /**
  * 
  * @link https://vk.com/dev/bots_docs_3?f=4.%20Bot%20keyboards
@@ -42,7 +40,7 @@ class Keyboard {
     
     /**
      * 
-     * @var (Cloure|callable)[]
+     * @var callable[]
      */
     protected static $payloadHandlers = [];
     
@@ -89,16 +87,17 @@ class Keyboard {
      * @param bool $inLine
      * @param bool $oneTime
      */
-    public function __construct($inLine = false, $oneTime = false) {
+    public function __construct(bool $inLine = false, bool $oneTime = false) {
         $this->reset($inLine);
         $this->onetime = $oneTime;
     }
     
     /**
      * 
+     * @internal
      * @param LongPollBot $lp
      */
-    public static function setLongPoll(LongPollBot $lp) {
+    public static function setLongPoll(LongPollBot $lp): void {
         self::generateKey();
         $lp->getHandler()->add(LongPollEvent::MESSAGE_NEW, function($obj) use($lp) {
             if (!$lp->isHandling()) {
@@ -121,7 +120,7 @@ class Keyboard {
             
             $handler = static::$payloadHandlers[$payload["onClick"]["id"]];
             $obj["payload"] = $payload["payload"] ?? [];
-            if ($handler instanceof Closure || is_callable($handler)) {
+            if (is_callable($handler)) {
                 $handler($obj);
             }
         });
@@ -151,7 +150,7 @@ class Keyboard {
             
             $handler = static::$payloadHandlers[$payload["onClick"]["id"]];
             $obj["payload"] = $payload["payload"] ?? [];
-            if ($handler instanceof Closure || is_callable($handler)) {
+            if (is_callable($handler)) {
                 $handler(new MessageEventAnswer($lp, $obj));
             }
         });
@@ -160,8 +159,8 @@ class Keyboard {
     /**
      * 
      * @param Button $btn
-     * @param Closure|callable $handler
-     * @return int
+     * @param callable $handler
+     * @return scalar
      */
     public static function addHandler(Button $btn, $handler) {
         static::$payloadHandlers[($id = $btn->getId())] = $handler;
@@ -182,19 +181,19 @@ class Keyboard {
      * 
      * @param int $id
      */
-    public static function removeHandler($id) {
+    public static function removeHandler(int $id): void {
         unset(static::$payloadHandlers[$id]);
     }
     
     /**
      * 
-     * @return (Closure|callable)[]
+     * @return callable[]
      */
-    public static function getHandlers() {
+    public static function getHandlers(): array {
         return static::$payloadHandlers;
     }
     
-    public static function generateKey() {
+    public static function generateKey(): void {
         if (static::$akey === null) {
             $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
             static::$akey = substr(str_shuffle($chars), 0, 8);
@@ -206,11 +205,9 @@ class Keyboard {
      * 
      * @param Button[] $buttons
      */
-    public function addButtons(...$buttons) {
+    public function addButtons(Button ...$buttons): void {
         foreach ($buttons as $button) {
-            if ($button instanceof Button) {
-                $this->addButton($button);
-            }
+            $this->addButton($button);
         }
     }
 
@@ -220,7 +217,7 @@ class Keyboard {
      * @param Button $button
      * @return self
      */
-    public function addButton(Button $button) {
+    public function addButton(Button $button): self {
         $line = $this->getLine();
         $fullSize = false;
         switch ($button->getType()) {
@@ -243,7 +240,7 @@ class Keyboard {
      * 
      * @return bool
      */
-    public function lineBreak() {
+    public function lineBreak(): bool {
         if (count($this->getLines()) > self::MAX_LINES_COUNT) {
             return false;
         } elseif ($this->isInline() && $this->getButtonsCount() > self::INLINE_MAX_BUTTONS) {
@@ -260,7 +257,7 @@ class Keyboard {
      * @param int $line
      * @return Button[]|int|null
      */
-    public function getLine($line = null) {
+    public function getLine(?int $line = null) {
         if ($line === null) {
             return key(array_slice($this->lines, -1, 1, true));
         }
@@ -273,7 +270,7 @@ class Keyboard {
      * @param bool $json
      * @return array|string
      */
-    public function getBody($empty = false, $json = true) {
+    public function getBody(bool $empty = false, bool $json = true) {
         $body = [
             "one_time" => $this->onetime,
             "inline" => $this->inline
@@ -327,7 +324,7 @@ class Keyboard {
      * 
      * @return int
      */
-    public function getButtonsCount() {
+    public function getButtonsCount(): int {
         $count = 0;
         foreach ($this->getLines() as $line) {
             $count += count($line);
@@ -339,7 +336,7 @@ class Keyboard {
      * 
      * @param bool $inline
      */
-    public function reset(bool $inline = false) {
+    public function reset(bool $inline = false): void {
         $this->inline = $inline;
         $this->lines = [[]];
         if ($this->inline) {

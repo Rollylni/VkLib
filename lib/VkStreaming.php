@@ -20,23 +20,35 @@
 namespace VkLib;
 
 use VkLib\Exception\VkStreamingException;
+use VkLib\Method\VkMethod;
 
 use Workerman\Worker;
 use Triggers;
 
 use function strtotime;
 use function method_exists;
-use function json_decode;
 
+/**
+ * 
+ * @link https://vk.com/dev/streaming_api_docs
+ */
 class VkStreaming {
     
     public const STAT_RECEIVED = "received";
     public const STAT_PREPARED = "prepared";
     
-    public const GET_RULES = "getRequest";
-    public const ADD_RULES = "postRequest";
-    public const DELETE_RULES = "deleteRequest";
-            
+    public const GET_RULES = "get";
+    public const ADD_RULES = "post";
+    public const DELETE_RULES = "delete";
+     
+    // Triggers
+    public const ON_CONNECT = "onConnect";
+    public const ON_ERROR = "onError";
+    public const ON_CLOSE = "onClose";
+    public const ON_MESSAGE = "onMessage";
+    public const ON_EVENT = "onEvent";
+    public const ON_SERVICE_MESSAGE = "onServiceMessage";
+    
     /**
      * 
      * @var Triggers
@@ -57,7 +69,7 @@ class VkStreaming {
     
     /**
      * 
-     * @param $client - Service Access Token
+     * @param string|VkClient $client - Service Access Token
      */
     public function __construct($client = VkClient::DEFAULT_CLIENT) {
         $this->client = VkClient::checkClient($client);
@@ -67,32 +79,32 @@ class VkStreaming {
      * 
      * @param array $ctx - SSL Context
      */
-    public function start(array $ctx = []) {
+    public function start(array $ctx = []): void {
         if (!$this->getEndpoint() || !$this->getKey()) {
             $this->authorization();
         }
         $worker = new Worker("websocket://".$this->getEndpoint()."/stream?key=".$this->getKey(), $ctx);
         $worker->transport = "ssl";
         $worker->onConnect = function($conn) {
-            $this->getHandler()->handle("onConnect", [$conn]);
+            $this->getHandler()->handle(self::ON_CONNECT, [$conn]);
         };
         
         $worker->onError = function($conn) {
-            $this->getHandler()->handle("onError", [$conn]);  
+            $this->getHandler()->handle(self::ON_ERROR, [$conn]);  
         };
         
         $worker->onClose = function($conn) {
-            $this->getHandler()->handle("onClose", [$conn]);
+            $this->getHandler()->handle(self::ON_CLOSE, [$conn]);
         };
         
         $worker->onMessage = function($conn, $data) {
-            $json = json_decode($data, true) ?? [];
-            $this->getHandler()->handle("onMessage", [$conn, $json]);
+            $json = VkMethod::JSON($data);
+            $this->getHandler()->handle(self::ON_MESSAGE, [$conn, $data]);
             
             if (isset($json["service_message"])) {
-                $this->getHandler()->handle("onServiceMessage", [$conn, $json["service_message"]]);
+                $this->getHandler()->handle(self::ON_SERVICE_MESSAGE, [$conn, $json["service_message"]]);
             } elseif (isset($json["event"])) {
-                $this->getHandler()->handle("onEvent", [$conn, $json["event"]]);
+                $this->getHandler()->handle(self::ON_EVENT, [$conn, $json["event"]]);
             }
         };
         $worker->runAll();
@@ -102,7 +114,7 @@ class VkStreaming {
      * 
      * @return string[][]
      */
-    public function getRules() {
+    public function getRules(): array {
         return $this->request(self::GET_RULES)["rules"] ?? [];
     }
     
@@ -111,7 +123,7 @@ class VkStreaming {
      * @param string $tag
      * @param string $value
      */
-    public function addRule($tag, $value) {
+    public function addRule(string $tag, string $value): self {
         $this->request(self::ADD_RULES, [
             "rule" => [
                 "value" => $value,
@@ -126,7 +138,7 @@ class VkStreaming {
      * @param string $tag
      * @return self
      */
-    public function deleteRule($tag) {
+    public function deleteRule(string $tag): self {
         $this->request(self::DELETE_RULES, [
             "tag" => $tag
         ]);
@@ -141,16 +153,17 @@ class VkStreaming {
      * @throws VkStreamingException
      * @return array
      */
-    public function request($method, array $params = [], bool $throws = true) {
+    public function request(string $method, array $params = [], bool $throws = true): array {
         $http = $this->getClient()->getHttpClient();
         if (!method_exists($http, $method)) {
             return [];
         }
         
         $url = "https://".$this->getEndpoint()."/rules?key=".$this->getKey();
-        $res = $http->{$method}($url, [
+        $res = VkMethod::JSON($http->{$method}($url, [
+            "http_errors" => $throws,
             "json" => $params
-        ]);
+        ]));
         
         if (isset($res["error"]) && $throws) {
             throw new VkStreamingException($res["error"]["message"], $res["error"]["error_code"]);
@@ -162,7 +175,7 @@ class VkStreaming {
      * 
      * @return self
      */
-    public function authorization() {
+    public function authorization(): self {
         $this->server = $this->getClient()->getApi()->streaming->getServerUrl()->json();
         return $this;
     }
@@ -171,7 +184,7 @@ class VkStreaming {
      * 
      * @return string[]
      */
-    public function getSettings() {
+    public function getSettings(): array {
         return $this->getClient()->getApi()->streaming->getSettings()->json();
     }
     
@@ -180,7 +193,7 @@ class VkStreaming {
      * @param string[] $params
      * @return self
      */
-    public function setSettings(array $params) {
+    public function setSettings(array $params): self {
         $this->getClient()->getApi()->streaming->setSettings($params);
         return $this;
     }
@@ -190,7 +203,7 @@ class VkStreaming {
      * @param string $word
      * @return string
      */
-    public function getStem($word) {
+    public function getStem(string $word): string {
         return $this->getClient()->getApi()->streaming->getStem([
             "word" => $word
         ])->json()["stem"] ?? "";
@@ -204,7 +217,8 @@ class VkStreaming {
      * @param string $end
      * @return mixed[]
      */
-    public function getStats($type = self::STAT_PREPARED, $interval = "5m", $start = "-1 day", $end = "now") {
+    public function getStats(string $type = self::STAT_PREPARED, string $interval = "5m", 
+                             string $start = "-1 day", string $end = "now"): array {
         return $this->getClient()->getApi()->streaming->getStats([
             "type" => $type,
             "interval" => $interval,
@@ -217,7 +231,7 @@ class VkStreaming {
      * 
      * @return string|null
      */
-    public function getEndpoint() {
+    public function getEndpoint(): ?string {
         return $this->server["endpoint"] ?? null;
     }
     
@@ -225,7 +239,7 @@ class VkStreaming {
      * 
      * @return string|null
      */
-    public function getKey() {
+    public function getKey(): ?string {
         return $this->server["key"] ?? null;
     }
     
@@ -233,7 +247,7 @@ class VkStreaming {
      * 
      * @return VkClient
      */
-    public function getClient() {
+    public function getClient(): VkClient {
         return $this->client;
     }
     
@@ -241,7 +255,7 @@ class VkStreaming {
      * 
      * @return Triggers
      */
-    public function getHandler() {
+    public function getHandler(): Triggers {
         if (!($this->handler instanceof Triggers)) {
             $this->handler = new Triggers();
         }

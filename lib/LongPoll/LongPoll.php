@@ -36,6 +36,12 @@ abstract class LongPoll {
     public const FAILED_SESSION_LOST = 3;
     public const FAILED_INVALID_VERSION = 4;
     
+    // Triggers
+    public const ON_START = "onStart";
+    public const ON_LISTEN = "onListen";
+    public const ON_FAILED = "onFailed";
+    public const ON_STOP = "onStop";
+    
     public const WAIT_MAX = 90;
     public const WAIT_DEF = 25;
     
@@ -67,7 +73,7 @@ abstract class LongPoll {
     
     /**
      * 
-     * @param $client
+     * @param string|VkClient $client
      */
     public function __construct($client = VkClient::DEFAULT_CLIENT) {
         $this->client = VkClient::checkClient($client);
@@ -90,7 +96,7 @@ abstract class LongPoll {
      * @param bool $ts
      * @return self
      */
-    public function connect(bool $ts = true) {
+    public function connect(bool $ts = true): self {
         $res = $this->getServer();
         $this->server = $res["server"];
         $this->key = $res["key"];
@@ -100,14 +106,14 @@ abstract class LongPoll {
         return $this;
     }
 
-    public function start() {
+    public function start(): void {
         $this->listen = true;
-        $this->getHandler()->handle("onStart");
+        $this->getHandler()->handle(self::ON_START);
         while ($this->listen) {
             $get = $this->getEvents();
-            $this->getHandler()->handle("onListen", [$get]);
+            $this->getHandler()->handle(self::ON_LISTEN, [$get]);
             if (isset($get["failed"])) {
-                $this->getHandler()->handle("onFailed", [$get]);
+                $this->getHandler()->handle(self::ON_FAILED, [$get]);
                 switch ($get["failed"]) {
                     case self::FAILED_TS_DEPRECATED:
                         $this->ts = $get["ts"];
@@ -121,20 +127,41 @@ abstract class LongPoll {
                 }
                 continue;
             }
+            
+            if (!isset($get["ts"]) || !isset($get["updates"])) {
+                continue;
+            }
+            
             $this->ts = $get["ts"];
             $events = $get["updates"];
             foreach ($events as $event) {
+                if (!$this->isListen()) {
+                    break;
+                }
                 $this->getHandler()->handle($event["type"], [$event["object"]]);
             }
         }
-        $this->getHandler()->handle("onStop");
+        $this->getHandler()->handle(self::ON_STOP);
     }
 
     /**
      *
+     * @since 0.7.1
+     * 
      * @return self
      */
-    public function stop() {
+    public function shutdown(): self {
+        $this->listen = false;
+        return $this;
+    }
+    
+    /**
+     *
+     * @deprecated
+     * 
+     * @return self
+     */
+    public function stop(): self {
         $this->listen = false;
         return $this;
     }
@@ -143,7 +170,7 @@ abstract class LongPoll {
      *
      * @return bool
      */
-    public function isListen() {
+    public function isListen(): bool {
         return $this->listen;
     }
 
@@ -152,7 +179,7 @@ abstract class LongPoll {
      * @param int $wait
      * @return self
      */
-    public final function setWait(int $wait) {
+    public final function setWait(int $wait): self {
         $this->wait = $wait;
         return $this;
     }
@@ -161,7 +188,7 @@ abstract class LongPoll {
      *
      * @return int
      */
-    public final function getWait() {
+    public final function getWait(): int {
         return $this->wait;
     }
     
@@ -169,7 +196,7 @@ abstract class LongPoll {
      * 
      * @return VkClient
      */
-    public function getClient() {
+    public function getClient(): VkClient {
         return $this->client;
     }
     
@@ -177,7 +204,7 @@ abstract class LongPoll {
      * 
      * @return Triggers
      */
-    public function getHandler() {
+    public function getHandler(): Triggers {
         if (!($this->handler instanceof Triggers)) {
             $this->handler = new Triggers();
         }

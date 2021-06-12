@@ -31,7 +31,7 @@ abstract class Content {
      * 
      * @return mixed[]
      */
-    public function getContent() {
+    public function getContent(): array {
         return $this->content;
     }
 }

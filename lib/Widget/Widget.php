@@ -19,10 +19,13 @@
  */
 namespace VkLib\Widget;
 
+use VkLib\Exception\UnexpectedTypeException;
+use VkLib\Widget\Content\Content;
 use VkLib\VkClient;
 
 use function json_encode;
 use function str_replace;
+use function is_array;
 
 /**
  * 
@@ -62,7 +65,7 @@ abstract class Widget {
      * 
      * @param string $title
      */
-    public function __construct($title) {
+    public function __construct(string $title) {
         $this->setTitle($title);
     }
     
@@ -70,7 +73,7 @@ abstract class Widget {
      * 
      * @param string $title
      */
-    public function setTitle($title) {
+    public function setTitle(string $title): self {
         $this->body["title"] = $title;
         return $this;
     }
@@ -79,7 +82,7 @@ abstract class Widget {
      * 
      * @param string $url
      */
-    public function setTitleUrl($url) {
+    public function setTitleUrl(string $url): self {
         $this->body["title_url"] = $url;
         return $this;
     }
@@ -88,7 +91,7 @@ abstract class Widget {
      * 
      * @param int $counter
      */
-    public function setTitleCounter($counter) {
+    public function setTitleCounter(int $counter): self {
         $this->body["title_counter"] = $counter;
         return $this;
     }
@@ -97,7 +100,7 @@ abstract class Widget {
      * 
      * @param string $more
      */
-    public function setMore($more) {
+    public function setMore(string $more): self {
         $this->body["more"] = $more;
         return $this;
     }
@@ -106,16 +109,16 @@ abstract class Widget {
      * 
      * @param string $url
      */
-    public function setMoreUrl($url) {
+    public function setMoreUrl(string $url): self {
         $this->body["more_url"] = $url;
         return $this;
     }
     
     /**
      * 
-     * @param $client - Required Access Token with app_widget Rights
+     * @param string|VkClient $client - Required Access Token with app_widget Rights
      */
-    public function update($client = VkClient::DEFAULT_CLIENT) {
+    public function update($client = VkClient::DEFAULT_CLIENT): void {
         $client = VkClient::checkClient($client);
         $client->getApi()->appWidgets->update([
             "type" => $this->getType(),
@@ -128,7 +131,7 @@ abstract class Widget {
      * @param bool $json
      * @return array|string
      */
-    public function getBody($json = true) {
+    public function getBody(bool $json = true) {
         if ($json) {
             return json_encode($this->body);
         }
@@ -137,9 +140,24 @@ abstract class Widget {
     
     /**
      * 
+     * @param array|Content $val
+     * @return array
+     */
+    public static function getContent($val): array {
+        if ($val instanceof Content) {
+            return $val->getContent();
+        } elseif (is_array($val)) {
+            return $val;
+        } else {
+            throw new UnexpectedTypeException($val, [Content::class, "array"]);
+        }
+    } 
+    
+    /**
+     * 
      * @return string
      */
-    public function getCode() {
+    public function getCode(): string {
         return $this->code;
     }
     
@@ -148,7 +166,7 @@ abstract class Widget {
      * @param string $code
      * @return self
      */
-    public function setCode($code) {
+    public function setCode(string $code): self {
         $this->code = $code;
         return $this;
     }
@@ -157,7 +175,7 @@ abstract class Widget {
      * 
      * @return string|null
      */
-    public function getType() {
+    public function getType(): ?string {
         return $this->type;
     }
 }

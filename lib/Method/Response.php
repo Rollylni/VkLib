@@ -53,18 +53,18 @@ class Response {
      * @see VkMethod::formatParameter()
      * @return mixed
      */
-    public function __call($method, $args) {
+    public function __call(string $method, array $args) {
         if (substr($method, 0, 3) === "get") {
             $offset = $args[0] ?? null;
             $param = VkMethod::formatParameter(substr($method, 3));
-            $json = $this->json();
             if ($offset !== null) {
-                if (isset($json["items"])) {
-                    $json = $json["items"];
+                if (isset($this->json()["items"][$offset][$param])) {
+                    return $this->json()["items"][$offset][$param];
+                } elseif (isset($this->json()[$offset][$param])) {
+                    return $this->json()[$offset][$param];
                 }
-                return $json[$offset][$param] ?? null;
             }
-            return $json[$param] ?? null;
+            return $this->json()[$param] ?? null;
         }
     }
     
@@ -84,23 +84,36 @@ class Response {
      * 
      * @return VkMethod
      */
-    public function getMethod() {
+    public function getMethod(): VkMethod {
         return $this->method;
     }
     
     /**
+     * 
+     * @since 0.7.1
+     * 
+     * @return string
+     */
+    public function getResponse(): string {
+        return json_encode($this->json());
+    }
+    
+    /**
+     * 
+     * @deprecated
      * 
      * @return string|false
      */
     public function getData() {
         return json_encode($this->json());
     }
+    
     /**
      * 
      * @param bool $resp
      * @return array
      */
-    public function json(bool $resp = true) {
+    public function json(bool $resp = true): array {
         if (isset($this->data["response"]) && $resp) {
             return $this->data["response"];
         }

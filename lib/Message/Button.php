@@ -19,11 +19,22 @@
  */
 namespace VkLib\Message;
 
+use VkLib\Exception\UnexpectedTypeException;
+
 use function json_encode;
+use function is_scalar;
 use function is_array;
 use function count;
 
 class Button {
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @var int
+     */
+    private static $counter = 0;
     
     public const TYPE_TEXT = "text";
     public const TYPE_OPEN_LINK = "open_link";
@@ -64,16 +75,54 @@ class Button {
      * @param string $type
      * @param string $color
      */
-    public function __construct($type = self::TYPE_TEXT, $color = self::COLOR_WHITE) {
+    public function __construct(string $type = self::TYPE_TEXT, string $color = self::COLOR_WHITE) {
         $this->setType($type);
         $this->setColor($color);
     }
     
     /**
      * 
+     * # Example 
+     * ```
+     * $keyboard->addButton(Button::create(
+     *     Button::TYPE_TEXT,
+     *     Button::COLOR_GREEN, 
+     *     "Hello", [], 
+     *     ["id" => "example", "handler" => function($obj) {}]
+     * ));
+     * 
+     * ```
+     * 
+     * @since 0.7.1
+     * 
+     * @param string $type
+     * @param string $color
+     * @param string $label
+     * @param string|array $payload
+     * @param (scalar|Closure|callable)[] $onClick
+     * @return Button
+     */
+    public static function create(string $type = self::TYPE_TEXT, string $color = self::COLOR_WHITE,
+                                  ?string $label = null, ?string  $payload = null, array $onClick = []): Button {
+        $btn = new self($type, $color);
+        if ($label !== null) {
+            $btn->setLabel($label);
+        } if ($payload !== null) {
+            $btn->setPayload($payload);
+        }
+        
+        $btn->setId($onClick["id"] ?? null);
+        if (isset($onClick["handler"])) {
+            $btn->onClick($onClick["handler"]);
+        }
+        return $btn;
+    }
+    
+    /**
+     * 
      * @see Keyboard::addHandler()
      * @param \Closure|callable $handler
-     * @return int
+     * @return scalar
      */
     public function onClick($handler) {
         return Keyboard::addHandler($this, $handler);
@@ -84,7 +133,7 @@ class Button {
      * @param bool $json
      * @return array|string
      */
-    public function getBody($json = true) {
+    public function getBody(bool $json = true) {
         $body = [
             "color" => $this->getColor(),
             "action" => $this->getAction()
@@ -100,7 +149,7 @@ class Button {
         return $body;
     }
     
-    public function clear() {
+    public function clear(): void {
         $this->action = [];
     }
     
@@ -108,7 +157,7 @@ class Button {
      * 
      * @param string $label
      */
-    public function setLabel($label) {
+    public function setLabel(string $label): self {
         return $this->setAction(self::ACTION_LABEL, $label);
     }
     
@@ -116,7 +165,7 @@ class Button {
      * 
      * @return string|null
      */
-    public function getLabel() {
+    public function getLabel(): ?string {
         return $this->getAction(self::ACTION_LABEL);
     }
     
@@ -124,7 +173,7 @@ class Button {
      * 
      * @param array|string $payload
      */
-    public function setPayload($payload) {
+    public function setPayload($payload): self {
         return $this->setAction(self::ACTION_PAYLOAD, $payload);
     }
     
@@ -140,7 +189,7 @@ class Button {
      * 
      * @param string $type
      */
-    public function setType($type) {
+    public function setType(string $type): self {
         return $this->setAction(self::ACTION_TYPE, $type);
     }
     
@@ -148,7 +197,7 @@ class Button {
      * 
      * @return string|null
      */
-    public function getType() {
+    public function getType(): ?string {
         return $this->getAction(self::ACTION_TYPE);
     }
     
@@ -158,7 +207,7 @@ class Button {
      * @param mixed $value
      * @return self
      */
-    public function setAction($key, $value) {
+    public function setAction(string $key, $value): self {
         $this->action[$key] = $value;
         return $this;
     }
@@ -168,7 +217,7 @@ class Button {
      * @param string $key
      * @return mixed
      */
-    public function getAction($key = null) {
+    public function getAction(?string $key = null) {
         if ($key === null) {
             return $this->action;
         }
@@ -178,9 +227,13 @@ class Button {
     /**
      * 
      * @param scalar $id
-     * @returns self
+     * @throws UnexpectedTypeException
+     * @return self
      */
-    public function setId($id = null) {
+    public function setId($id = null): self {
+        if (!is_scalar($id) && $id !== null) {
+            throw new UnexpectedTypeException($id, ["scalar", "null"]);
+        }
         $this->id = $id;
         return $this;
     }
@@ -191,7 +244,7 @@ class Button {
      */
     public function getId() {
         if ($this->id === null) {
-            return $this->id = count(Keyboard::getHandlers());
+            return $this->id = ++static::$counter;
         }
         return $this->id;
     }
@@ -201,7 +254,7 @@ class Button {
      * @param string $color
      * @return self
      */
-    public function setColor($color) {
+    public function setColor(string $color): self {
         $this->color = $color;
         return $this;
     }
@@ -210,7 +263,7 @@ class Button {
      * 
      * @return string
      */
-    public function getColor() {
+    public function getColor(): string {
         return $this->color;
     }
 }

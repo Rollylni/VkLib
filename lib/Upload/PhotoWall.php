@@ -32,7 +32,7 @@ class PhotoWall extends Upload {
      * @param array $params 
      * @retuirn array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->groupId) {
             $params["group_id"] = $this->groupId;
         }
@@ -44,7 +44,7 @@ class PhotoWall extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->saveWallPhoto($params)->json();
     }
     
@@ -66,7 +66,7 @@ class PhotoWall extends Upload {
      * 
      * @param int $id
      */
-    public function setGroupId($id) {
+    public function setGroupId(int $id): self {
         $this->groupId = $id;
         return $id;
     }
@@ -75,7 +75,7 @@ class PhotoWall extends Upload {
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

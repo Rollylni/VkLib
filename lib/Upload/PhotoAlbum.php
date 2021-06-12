@@ -38,7 +38,7 @@ class PhotoAlbum extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->albumId) {
             $params["album_id"] = $this->albumId;
         } if ($this->groupId) {
@@ -52,7 +52,7 @@ class PhotoAlbum extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->save($params)->json();
     }
     
@@ -78,7 +78,7 @@ class PhotoAlbum extends Upload {
      * 
      * @param int $id
      */
-    public function setAlbumId($id) {
+    public function setAlbumId(int $id): self {
         $this->albumId = $id;
         return $this;
     }
@@ -87,7 +87,7 @@ class PhotoAlbum extends Upload {
      * 
      * @param int $id
      */
-    public function setGroupId($id) {
+    public function setGroupId(int $id): self {
         $this->groupId = $id;
         return $this;
     }
@@ -96,7 +96,7 @@ class PhotoAlbum extends Upload {
      * 
      * @param string $src
      */
-    public function addPhoto($src) {
+    public function addPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

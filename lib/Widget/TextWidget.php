@@ -35,7 +35,7 @@ class TextWidget extends Widget {
      * 
      * @param string $text
      */
-    public function setText($text) {
+    public function setText(string $text): self {
         $this->body["text"] = $text;
         return $this;
     }
@@ -44,7 +44,7 @@ class TextWidget extends Widget {
      * 
      * @param string $descr
      */
-    public function setDescr($descr) {
+    public function setDescr(string $descr): self {
         $this->body["descr"] = $descr;
         return $this;
     }

@@ -25,16 +25,16 @@ class PhotoMessages extends Upload {
      * 
      * @var int
      */
-    public $peerId = null;
+    public $groupId = null;
     
     /**
      * 
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
-        if ($this->peerId) {
-            $params["peer_id"] = $this->peerId;
+    public function getServer(array $params = []): array {
+        if ($this->groupId) {
+            $params["group_id"] = $this->groupId;
         }
         return $this->getClient()->getApi()->photos->getMessagesUploadServer($params)->json();
     }
@@ -44,7 +44,7 @@ class PhotoMessages extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->saveMessagesPhoto($params)->json();
     }
     
@@ -56,15 +56,15 @@ class PhotoMessages extends Upload {
     public function upload(array $params = []): array {
         $url = $this->getServer()["upload_url"];
         $res = $this->post($url, "photo");
-        return $this->save($res);
+        return $this->save($params + $res);
     }
     
     /**
      * 
      * @param int $id
      */
-    public function setPeerId($id) {
-        $this->peerId = $id;
+    public function setGroupId(int $id): self {
+        $this->groupId = $id;
         return $this;
     }
     
@@ -72,7 +72,7 @@ class PhotoMessages extends Upload {
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

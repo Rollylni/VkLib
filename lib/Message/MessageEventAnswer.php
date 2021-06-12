@@ -60,7 +60,7 @@ class MessageEventAnswer {
      * 
      * @param string $link url
      */
-    public function openLink($link) {
+    public function openLink(string $link): void {
         $this->sendAnswer([
             "type" => self::TYPE_OPEN_LINK,
             "link" => $link
@@ -71,7 +71,7 @@ class MessageEventAnswer {
      * 
      * @param string $text Max 90 symbols
      */
-    public function showSnackbar($text) {
+    public function showSnackbar(string $text): void {
         $this->sendAnswer([
             "type" => self::TYPE_SHOW_SNACKBAR,
             "text" => $text
@@ -84,7 +84,7 @@ class MessageEventAnswer {
      * @param string $hash
      * @param int $ownerId
      */
-    public function openApp($appId, $hash, $ownerId = null) {
+    public function openApp(int $appId, string $hash, ?int $ownerId = null): void {
         $this->sendAnswer([
             "type" => self::TYPE_OPEN_APP,
             "app_id" => $appId,
@@ -95,9 +95,9 @@ class MessageEventAnswer {
     
     /**
      * 
-     * @return array $data
+     * @param array $data
      */
-    public function sendAnswer(array $data) {
+    public function sendAnswer(array $data): void {
         $this->getLp()->getClient()->getApi()->messages->sendMessageEventAnswer([
             "event_id" => $this->getEventId(),
             "user_id" => $this->getUserId(),
@@ -110,7 +110,7 @@ class MessageEventAnswer {
      * 
      * @return array|null
      */
-    public function getPayload() {
+    public function getPayload(): ?array {
         return $this->object["paylaod"] ?? null;
     }
 
@@ -119,7 +119,7 @@ class MessageEventAnswer {
      * 
      * @return string|null
      */
-    public function getEventId() {
+    public function getEventId(): ?string {
         return $this->object["event_id"] ?? null;
     }
     
@@ -127,7 +127,7 @@ class MessageEventAnswer {
      * 
      * @return int|null
      */
-    public function getPeerId() {
+    public function getPeerId(): ?int {
         return $this->object["peer_id"] ?? null;
     }
     
@@ -135,7 +135,7 @@ class MessageEventAnswer {
      * 
      * @return int|null
      */
-    public function getUserId() {
+    public function getUserId(): ?int {
         return $this->object["user_id"] ?? null;
     }
     
@@ -143,7 +143,7 @@ class MessageEventAnswer {
      * 
      * @return int|null
      */
-    public function getMessageId() {
+    public function getMessageId(): ?int {
         return $this->object["conversation_message_id"] ?? null;
     }
     

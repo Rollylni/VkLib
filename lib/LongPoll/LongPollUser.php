@@ -20,8 +20,10 @@
 namespace VkLib\LongPoll;
 
 use VkLib\VkClient;
-use VkLib\Exception\HttpRequestException;
+use VkLib\Method\VkMethod;
 use VkLib\Exception\VkMethodException;
+
+use function is_array;
 
 /**
  * 
@@ -50,11 +52,14 @@ class LongPollUser extends LongPoll {
     public const MESSAGE_OUTBOX_FLAG = 2;
     public const MESSAGE_REPLIED_FLAG = 4;
     public const MESSAGE_IMPORTANT_FLAG = 8;
+    /** @deprecated*/
     public const MESSAGE_CHAT_FLAG = 16;
     public const MESSAGE_FRIENDS_FLAG = 32;
     public const MESSAGE_SPAM_FLAG = 64;
     public const MESSAGE_DELETED_FLAG = 128;
+    /** @deprecated*/
     public const MESSAGE_FIXED_FLAG = 256;
+    /** @deprecated*/
     public const MESSAGE_MEDIA_FLAG = 512;
     public const MESSAGE_HIDDEN_FLAG = 65536;
     public const MESSAGE_DELETE_FOR_ALL_FLAG = 131072;
@@ -100,16 +105,17 @@ class LongPollUser extends LongPoll {
     
     /**
      * 
-     * @param $client
+     * @param string|VkClient $client
      * @param int $mode
      * @param int $version
      */
-    public function __construct($client = VkClient::DEFAULT_CLIENT, int $mode = self::MODE_GET_EXTENDED, int $version = self::CURRENT_VERSION) {
+    public function __construct($client = VkClient::DEFAULT_CLIENT, int $mode = self::MODE_GET_EXTENDED,
+                                int $version = self::CURRENT_VERSION) {
         parent::__construct($client);
         $this->version = $version;
         $this->mode = $mode;
         
-        $this->getHandler()->add("onFailed", function($failed) {
+        $this->getHandler()->add(self::ON_FAILED, function($failed) {
             if ($failed["failed"] === self::FAILED_INVALID_VERSION) {
                 $this->version = $failed["max_version"] ?? self::CURRENT_VERSION;
             }
@@ -119,11 +125,10 @@ class LongPollUser extends LongPoll {
     /**
      * 
      * @param array $params
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @return array
      */
-    public function getHistory($params = []): array {
+    public function getHistory(array $params = []): array {
         $params["ts"] = $this->ts;
         $params["pts"] = $this->pts;
         return $this->getClient()->getApi()->messages->getLongPollHistory($params)->json();
@@ -131,19 +136,24 @@ class LongPollUser extends LongPoll {
     
     /**
      * 
-     * @throws HttpRequestException
      * @return array
      */
     public function getEvents(): array {
-        $res = $this->getClient()->getHttpClient()->postRequest("https://{$this->server}", ["form_params" => [
+        $res = VkMethod::JSON($this->getClient()->getHttpClient()->post("https://{$this->server}", ["form_params" => [
             "act" => "a_check",
             "version" => $this->version,
             "mode" => $this->mode,
             "wait" => $this->wait,
             "key" => $this->key,
             "ts" => $this->ts
-        ]]);
+        ]]));
         
+        if (!isset($res["updates"])) {
+            return $res;
+        }
+        
+        // this idea was taken from: https://github.com/python273/vk_api
+        // :)
         $extra_fields = ["peer_id", "timestamp", "text", "extra_fields", "attachments", "random_id"];
         $events = [
             LongPollEvent::MESSAGE_FLAGS_REPLACE => array_merge(["message_id", "flags"], $extra_fields),
@@ -198,7 +208,6 @@ class LongPollUser extends LongPoll {
     
     /**
      *
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @return array
      */
@@ -223,7 +232,7 @@ class LongPollUser extends LongPoll {
      * @param int $version
      * @return self
      */
-    public function setVersion(int $version) {
+    public function setVersion(int $version): self {
         $this->version = $version;
         return $this;
     }
@@ -241,7 +250,7 @@ class LongPollUser extends LongPoll {
      * @param int $mode
      * @return self
      */
-    public function setMode(int $mode) {
+    public function setMode(int $mode): self {
         $this->mode = $mode;
         return $this;
     }
@@ -260,7 +269,7 @@ class LongPollUser extends LongPoll {
      * @param mixed $value
      * @return self
      */
-    public function setParam($key, $value) {
+    public function setParam(string $key, $value): self {
         $this->params[$key] = $value;
         return $this;
     }

@@ -32,7 +32,7 @@ class Document extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->groupId) {
             $params["group_id"] = $this->groupId;
         }
@@ -44,7 +44,7 @@ class Document extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->docs->save($params)->json();
     }
     
@@ -63,7 +63,7 @@ class Document extends Upload {
      * 
      * @param int $id
      */
-    public function setGroupId($id) {
+    public function setGroupId(int $id): self {
         $this->groupId = $id;
         return $this;
     }
@@ -72,7 +72,7 @@ class Document extends Upload {
      * 
      * @param string $src
      */
-    public function setDocument($src) {
+    public function setDocument(string $src): self {
         return $this->addFile($src);
     }
 }

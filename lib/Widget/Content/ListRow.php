@@ -33,7 +33,7 @@ class ListRow extends Content {
      * 
      * @param string $title
      */
-    public function setTitle($title) {
+    public function setTitle(string $title): self {
         $this->content["title"] = $title;
         return $this;
     }
@@ -42,7 +42,7 @@ class ListRow extends Content {
      * 
      * @param string $url
      */
-    public function setTitleUrl($url) {
+    public function setTitleUrl(string $url): self {
         $this->content["title_url"] = $url;
         return $this;
     }
@@ -51,7 +51,7 @@ class ListRow extends Content {
      * 
      * @param string $text
      */
-    public function setButton($text) {
+    public function setButton(string $text): self {
         $this->content["button"] = $text;
         return $this;
     }
@@ -60,7 +60,7 @@ class ListRow extends Content {
      * 
      * @param string $url
      */
-    public function setButtonUrl($url) {
+    public function setButtonUrl(string $url): self {
         $this->content["button_url"] = $url;
         return $this;
     }
@@ -69,7 +69,7 @@ class ListRow extends Content {
      * 
      * @param string $id
      */
-    public function setIconId($id) {
+    public function setIconId(string $id): self {
         $this->content["icon_id"] = $id;
         return $this;
     }
@@ -78,7 +78,7 @@ class ListRow extends Content {
      * 
      * @param string $descr
      */
-    public function setDescr($descr) {
+    public function setDescr(string $descr): self {
         $this->content["descr"] = $descr;
         return $this;
     }
@@ -87,7 +87,7 @@ class ListRow extends Content {
      * 
      * @param string $address
      */
-    public function setAddress($address) {
+    public function setAddress(string $address): self {
         $this->content["address"] = $address;
         return $this;
     }
@@ -96,7 +96,7 @@ class ListRow extends Content {
      * 
      * @param string $time
      */
-    public function setTime($time) {
+    public function setTime(string $time): self {
         $this->content["time"] = $time;
         return $this;
     }
@@ -105,7 +105,7 @@ class ListRow extends Content {
      * 
      * @param string $text
      */
-    public function setText($text) {
+    public function setText(string $text): self {
         $this->content["text"] = $text;
         return $this;
     }

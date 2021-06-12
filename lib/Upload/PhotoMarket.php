@@ -31,44 +31,12 @@ class PhotoMarket extends Upload {
     
     /**
      * 
-     * @var bool
-     */
-    public $mainPhoto = true;
-    
-    /**
-     * 
-     * @var int
-     */
-    public $cropX = null;
-    
-    /**
-     * 
-     * @var int
-     */
-    public $cropY = null;
-    
-    /**
-     * 
-     * @var int
-     */
-    public $cropWidth = null;
-    
-    /**
-     * 
      * @param array $params
      * @return array 
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->groupId) {
             $params["group_id"] = $this->groupId;
-        } if ($this->cropX !== null) {
-            $params["crop_x"] = $this->cropX;
-        } if ($this->cropX !== null) {
-            $params["crop_y"] = $this->cropY;
-        } if ($this->cropWidth !== null) {
-            $params["crop_width"] = $this->cropWidth;
-        } if (!isset($params["main_photo"])) {
-            $params["main_photo"] = intval($this->mainPhoto);
         }
         return $this->getClient()->getApi()->photos->getMarketUploadServer($params)->json();
     }
@@ -78,7 +46,7 @@ class PhotoMarket extends Upload {
      * @param array $params
      * @return array 
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->saveMarketPhoto($params)->json();
     }
     
@@ -98,9 +66,9 @@ class PhotoMarket extends Upload {
     
     /**
      * 
-     * @param string $id
+     * @param int $id
      */
-    public function setGroupId($id) {
+    public function setGroupId(int $id): self {
         $this->groupId = $id;
         return $this;
     }
@@ -109,29 +77,15 @@ class PhotoMarket extends Upload {
      * 
      * @param bool $mainPhoto
      */
-    public function setMainPhoto($mainPhoto) {
-        $this->mainPhoto = $mainPhoto;
-        return $this;
-    }
-    
-    /**
-     * 
-     * @param int $x
-     * @param int $y
-     * @param int $width
-     */
-    public function setCrop($x, $y, $width) {
-        $this->cropX = $x;
-        $this->cropY = $y;
-        $this->cropWidth = $width;
-        return $this;
+    public function setMainPhoto(bool $mainPhoto = true): self {
+        return $this->addParam("main_photo", intval($maiPhoto));
     }
     
     /**
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

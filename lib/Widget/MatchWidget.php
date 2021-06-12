@@ -39,7 +39,7 @@ class MatchWidget extends Widget {
      * @param string $event
      * @param int $minute
      */
-    public function addEvent($team, $event, $minute) {
+    public function addEvent(string $team, string $event, int $minute): self {
         $team = $this->getTeam($team);
         if (!$team) {
             return;
@@ -58,7 +58,7 @@ class MatchWidget extends Widget {
      * @param string $descr
      * @param string $iconId
      */
-    public function setTeam($team, $name, $descr = null, $iconId = null) {
+    public function setTeam(string $team, string $name, ?string $descr = null, ?string $iconId = null): self {
         $team = $this->getTeam($team);
         if (!$team) {
             return;
@@ -78,7 +78,7 @@ class MatchWidget extends Widget {
      * 
      * @param string $state
      */
-    public function setState($state) {
+    public function setState(string $state): self {
         $this->body["match"]["state"] = $state;
         return $this;
     }
@@ -88,7 +88,7 @@ class MatchWidget extends Widget {
      * @param int $scoreA
      * @param int $scoreB
      */
-    public function setScore($scoreA, $scoreB) {
+    public function setScore(int $scoreA, int $scoreB): self {
         $this->body["match"]["score"] = [
             "team_a" => $scoreA,
             "team_b" => $scoreB
@@ -99,9 +99,9 @@ class MatchWidget extends Widget {
     /**
      *
      * @param string $team
-     * @return string|false
+     * @return string|null
      */
-    public static function getTeam($team) {
-        return in_array($team, ['a', 'b']) ? "team_$team" : false;
+    public static function getTeam(string $team): ?string {
+        return in_array($team, ['a', 'b']) ? "team_$team" : null;
     }
 }

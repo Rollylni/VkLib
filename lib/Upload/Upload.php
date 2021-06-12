@@ -19,6 +19,7 @@
  */
 namespace VkLib\Upload;
 
+use VkLib\Method\VkMethod;
 use VkLib\VkClient;
 
 use function fopen;
@@ -51,7 +52,7 @@ abstract class Upload {
     
     /**
      * 
-     * @param $client
+     * @param string|VkClient $client
      */
     public function __construct($client = VkClient::DEFAULT_CLIENT) {
         $this->client = VkClient::checkClient($client);
@@ -61,13 +62,17 @@ abstract class Upload {
      * 
      * @return array
      */
-    public function getServer() {}
+    public function getServer(): array {
+        return [];
+    }
     
     /**
      * 
      * @return array
      */
-    public function save() {}
+    public function save(): array {
+        return [];
+    }
     
     /**
      * 
@@ -82,7 +87,7 @@ abstract class Upload {
      * @param string $format
      * @return array
      */
-    public function post($url, $format = "file%") {
+    public function post(string $url, string $format = "file%"): array {
         $multipart = [];
         foreach ($this->getParams() as $k => $v) {
             $multipart[] = [
@@ -100,9 +105,9 @@ abstract class Upload {
                 "contents" => fopen($v, "rb")
             ];
         }
-        return $this->getClient()->getHttpClient()->postRequest($url, [
+        return VkMethod::JSON($this->getClient()->getHttpClient()->post($url, [
             "multipart" => $multipart
-        ]);
+        ]));
     }
     
     /**
@@ -110,7 +115,7 @@ abstract class Upload {
      * @param string $key
      * @param mixed $value
      */
-    public function addParam($key, $value) {
+    public function addParam(string $key, $value): self {
         $this->params[$key] = $value;
         return $this;
     }
@@ -119,7 +124,7 @@ abstract class Upload {
      * 
      * @param string $fileSrc
      */
-    public function addFile($fileSrc) {
+    public function addFile(string $fileSrc): self {
         $this->files[] = $fileSrc;
         return $this;
     }
@@ -128,7 +133,7 @@ abstract class Upload {
      * 
      * @return mixed[]
      */
-    public function getParams() {
+    public function getParams(): array {
         return $this->params;
     }
     
@@ -136,7 +141,7 @@ abstract class Upload {
      * 
      * @return string[]
      */
-    public function getFiles() {
+    public function getFiles(): array {
         return $this->files;
     }
     
@@ -144,7 +149,7 @@ abstract class Upload {
      * 
      * @return VkCLient
      */
-    public function getClient() {
+    public function getClient(): VkClient {
         return $this->client;
     }
 }

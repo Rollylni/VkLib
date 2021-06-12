@@ -1,7 +1,7 @@
 {
   "name": "rollylni/vklib",
   "description": "library for simplified work with VK-API",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "type": "library",
   "keywords": ["vk-api", "php", "sdk"],
   "time": "2020-12-08 23:34:06",
@@ -18,7 +18,7 @@
     "php": ">=7.1",
     "ext-json": "*",
     "ext-ctype": "*",
-    "rollylni/triggers": "0.0.3",
+    "rollylni/triggers": "0.0.4",
     "guzzlehttp/guzzle": ">=7.0.0",
     "workerman/workerman": ">=4.0.0"
   },

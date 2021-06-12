@@ -26,7 +26,7 @@ class Audio extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         return $this->getClient()->getApi()->audio->getUploadServer($params)->json();
     }
     
@@ -35,7 +35,7 @@ class Audio extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->audio->save($params)->json();
     }
     
@@ -54,7 +54,7 @@ class Audio extends Upload {
      * 
      * @param string $src
      */
-    public function setAudio($src) {
+    public function setAudio(string $src): self {
         return $this->addFile($src);
     }
 }

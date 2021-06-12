@@ -42,7 +42,7 @@ class DocumentMessages extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->peerId) {
             $params["peer_id"] = $this->peerId;
         } if (!isset($params["type"])) {
@@ -56,7 +56,7 @@ class DocumentMessages extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->docs->save($params)->json();
     }
     
@@ -75,7 +75,7 @@ class DocumentMessages extends Upload {
      * 
      * @param int $id
      */
-    public function setPeerId($id) {
+    public function setPeerId(int $id): self {
         $this->peerId = $id;
         return $this;
     }
@@ -84,7 +84,7 @@ class DocumentMessages extends Upload {
      * 
      * @param string $src
      */
-    public function setDocument($src) {
+    public function setDocument(string $src): self {
         $this->type = self::TYPE_DOCUMENT;
         return $this->addFile($src);
     }
@@ -93,7 +93,7 @@ class DocumentMessages extends Upload {
      * 
      * @param string $src
      */
-    public function setGraffiti($src) {
+    public function setGraffiti(string $src): self {
         $this->type = self::TYPE_GRAFFITI;
         return $this->addFile($src);
     }
@@ -102,7 +102,7 @@ class DocumentMessages extends Upload {
      * 
      * @param string $src
      */
-    public function setAudio($src) {
+    public function setAudio(string $src): self {
         $this->type = self::TYPE_AUDIO;
         return $this->addFile($src);
     }

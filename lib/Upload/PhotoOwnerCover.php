@@ -43,7 +43,7 @@ class PhotoOwnerCover extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->groupId) {
             $params["group_id"] = $this->groupId;
         }
@@ -56,7 +56,7 @@ class PhotoOwnerCover extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->saveOwnerCoverPhoto($params)->json();
     }
     
@@ -75,7 +75,7 @@ class PhotoOwnerCover extends Upload {
      * 
      * @param int $id
      */
-    public function setGroupId($id) {
+    public function setGroupId(int $id): self {
         $this->groupId = $id;
         return $this;
     }
@@ -84,7 +84,7 @@ class PhotoOwnerCover extends Upload {
      * 
      * @param int[] $params
      */
-    public function setCropParams(array $params) {
+    public function setCropParams(array $params): self {
         $this->cropParams = $params;
         return $this;
     }
@@ -93,7 +93,7 @@ class PhotoOwnerCover extends Upload {
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

@@ -40,7 +40,7 @@ class TableWidget extends Widget {
      * @param string $text
      * @param string $align
      */
-    public function addHeader($text, $align = self::ALIGN_CENTER) {
+    public function addHeader(string $text, string $align = self::ALIGN_CENTER): self {
         $this->body["head"][] = [
             "text" => $text,
             "align" => $align
@@ -54,7 +54,7 @@ class TableWidget extends Widget {
      * @param string $url
      * @param string|array $icon_id
      */
-    public function addBody($text, $url = null, $icon_id = null) {
+    public function addBody(string $text, ?string $url = null, $icon_id = null): self {
         $body = ["text" => $text];   
         if ($url) {
             $body["url"] = $url;

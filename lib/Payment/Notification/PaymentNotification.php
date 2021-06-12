@@ -75,7 +75,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * @param array $params
      * @return mixed
      */
-    public function __call($method, $params) {
+    public function __call(string $method, array $params) {
         $pref = substr($method, 0, 3);
         $noPref = substr($method, 3);
         if ($pref === "get") {
@@ -91,7 +91,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * @param mixed $value
      * @return self
      */
-    public function setField($field, $value) {
+    public function setField(string $field, $value): self {
         $this->output[$field] = $value;
         return $this;
     }
@@ -100,7 +100,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * @param string $field
      * @return mixed
      */
-    public function getField($field) {
+    public function getField(string $field) {
         return $this->input[$field] ?? null;
     }
     
@@ -108,7 +108,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * 
      * @return array
      */
-    public function getInput() {
+    public function getInput(): array {
         return $this->input;
     }
     
@@ -116,7 +116,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * 
      * @return array
      */
-    public function getOutput() {
+    public function getOutput(): array {
         return $this->output;
     }
     
@@ -124,7 +124,7 @@ abstract class PaymentNotification implements PaymentResponse {
      * 
      * @return array
      */
-    public function getRequired() {
+    public function getRequired(): array {
         return $this->required;
     }
     

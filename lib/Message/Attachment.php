@@ -19,7 +19,10 @@
  */
 namespace VkLib\Message;
 
+use VkLib\Exception\UnexpectedTypeException;
+
 use function array_slice;
+use function is_array;
 use function is_array;
 use function explode;
 use function implode;
@@ -70,12 +73,12 @@ class Attachment {
      */
     public function __construct($attach) {
         if (is_array($attach)) {
-            $this->type = $attach[0];
-            $this->ownerId = $attach[1];
-            $this->mediaId = $attach[2];
+            $this->type = $attach[0] ?? null;
+            $this->ownerId = $attach[1] ?? null;
+            $this->mediaId = $attach[2] ?? null;
             $this->accessKey = $attach[3] ?? null;
             $this->attachments[] = $this;
-        } else {
+        } elseif (is_string($attach)) {
             $this->attachments = $f = $this->format($attach, static::$limit);
             if (isset($f[0])) {
                 $this->type = $f[0]->getType();
@@ -83,6 +86,8 @@ class Attachment {
                 $this->mediaId = $f[0]->getId();
                 $this->accessKey = $f[0]->getKey();
             }
+        } else {
+            throw new UnexpectedTypeException($attach, ["string", "array"]);
         }
     }
    
@@ -115,7 +120,7 @@ class Attachment {
      * 
      * @return string
      */
-    public function getBody() {
+    public function getBody(): string {
         return $this->deformat($this->getAttachments(), static::$limit);
     }
    
@@ -123,39 +128,39 @@ class Attachment {
      * 
      * @return Attachment[]
      */
-    public function getAttachments() {
+    public function getAttachments(): array {
         return $this->attachments;
     }
    
     /**
      * 
-     * @return string
+     * @return string|null
      */
-    public function getType() {
+    public function getType(): ?string {
         return $this->type;
     }
    
     /**
      * 
-     * @return string
+     * @return string|null
      */
-    public function getKey() {
+    public function getKey(): ?string {
         return $this->accessKey;
     }
    
     /**
      * 
-     * @return int
+     * @return int|null
      */
-    public function getOwnerId() {
+    public function getOwnerId(): ?int {
         return $this->ownerId;
     }
    
     /**
      * 
-     * @return int
+     * @return int|null
      */
-    public function getId() {
+    public function getId(): ?int {
         return $this->mediaId;
     }
    

@@ -20,9 +20,9 @@
 namespace VkLib\LongPoll;
 
 use VkLib\VkClient;
-use VkLib\Exception\HttpRequestException;
 use VkLib\Exception\VkMethodException;
 use VkLib\Message\Keyboard;
+use VkLib\Method\VkMethod;
 
 /**
  * 
@@ -45,18 +45,27 @@ class LongPollBot extends LongPoll {
     /**
      * 
      * @param int $gid
-     * @param $client
+     * @param string|VkClient $client
      */
-    public function __construct($gid, $client = VkClient::DEFAULT_CLIENT) {
+    public function __construct(int $gid, $client = VkClient::DEFAULT_CLIENT) {
         parent::__construct($client);
         $this->gid = $gid;
     }
     
     /**
      * 
+     * @since 0.7.1
+     * @return int
+     */
+    public function getGroupId(): int {
+        return $this->gid;
+    }
+    
+    /**
+     * 
      * @param bool $handle
      */
-    public function setHandling(bool $handle = true) {
+    public function setHandling(bool $handle = true): void {
         $this->payloadHandling[0] = $handle;
         if (!$this->payloadHandling[1] && $handle) {
             Keyboard::setLongPoll($this);
@@ -69,17 +78,16 @@ class LongPollBot extends LongPoll {
      * 
      * @return bool
      */
-    public function isHandling() {
+    public function isHandling(): bool {
         return $this->payloadHandling[0];
     }
     
     /**
      * 
-     * @throws HttpRequestException
      * @throws VkMethodException
-     * @param string|float $v
+     * @param string $v
      */
-    public function setApiVersion($v) {
+    public function setApiVersion(string $v): void {
         $this->setSettings([
             "api_version" => $v
         ]);
@@ -87,52 +95,47 @@ class LongPollBot extends LongPoll {
     
     /**
      * 
-     * @throws HttpException
      * @throws VkMethodException
      * @return string|null
      */
-    public function getApiVersion() {
+    public function getApiVersion(): ?string {
         return $this->getSettings()["api_version"] ?? null;
     }
     
     /**
      * 
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @param bool $v
      */
-    public function setEnabled(bool $v) {
+    public function setEnabled(bool $v): void {
         $this->setSettings([
-            "enabled" => intval($v)
+            "enabled" => $v
         ]);
     }
     /**
      * 
-     * @throws HttpException
      * @throws VkMethodException
      * @return bool
      */
-    public function isEnabled() {
+    public function isEnabled(): bool {
         return $this->getSettings()["is_enabled"] ?? false;
     }
     
     /**
      * 
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @param (int|string)[] $settings
      */
-    public function setSettings($settings) {
+    public function setSettings(array $settings): void {
         $settings["group_id"] = $this->gid;
         $this->getClient()->getApi()->groups->setLongPollSettings($settings);
     }
     /**
      * 
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @return (bool|array|string)[]
      */
-    public function getSettings() {
+    public function getSettings(): array {
         return $this->getClient()->getApi()->groups->getLongPollSettings([
             "group_id" => $this->gid
         ])->json();
@@ -140,7 +143,6 @@ class LongPollBot extends LongPoll {
     
     /**
      *
-     * @throws HttpRequestException
      * @throws VkMethodException
      * @return array
      */
@@ -152,15 +154,14 @@ class LongPollBot extends LongPoll {
     
     /**
      * 
-     * @throws HttpRequestException
      * @return array
      */
     public function getEvents(): array {
-        return $this->getClient()->getHttpClient()->postRequest($this->server, ["form_params" => [
+        return VkMethod::JSON($this->getClient()->getHttpClient()->post($this->server, ["form_params" => [
             "act" => "a_check",
             "wait" => $this->wait,
             "key" => $this->key,
             "ts" => $this->ts,
-        ]]);
+        ]]));
     }
 }

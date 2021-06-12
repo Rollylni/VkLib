@@ -20,10 +20,15 @@
  */
 namespace VkLib;
 
+use VkLib\Exception\UnexpectedTypeException;
 use VkLib\Exception\VkClientException;
-use VkLib\HttpClient\BaseHttpClient;
-use VkLib\HttpClient\HttpClient;
 
+use GuzzleHttp\Handler\StreamHandler;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Client;
+
+use function is_string;
 use function strlen;
 
 final class VkClient {
@@ -38,7 +43,7 @@ final class VkClient {
     
     /**
      * 
-     * @var HttpClient
+     * @var ClientInterface
      */
     private $httpClient = null;
     
@@ -79,9 +84,29 @@ final class VkClient {
      * @var float  $version
      * @var string $lang
      */
-    public function __construct($client = VkClient::DEFAULT_CLIENT, $version = VkApi::CURRENT_VERSION, $lang = VkLang::ENGLISH) {
+    public function __construct(string $client = VkClient::DEFAULT_CLIENT, float $version = VkApi::CURRENT_VERSION, string $lang = VkLang::ENGLISH) {
         $this->setVersion($version)->setLang($lang)->addClient($client, $this);
         $this->name = $client;
+    }
+    
+    /**
+     * Removing this client
+     * 
+     * @since 0.7.1
+     */
+    public function remove(): void {
+        $this->removeClient($this);
+    }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @param string $name
+     */
+    public function rename(string $name): void {
+        $this->remove();
+        $this->addClient($name, $this)
     }
     
     /**
@@ -89,7 +114,7 @@ final class VkClient {
      * @param string $name
      * @param VkClient $client
      */
-    public static function addClient($name, VkClient $client) {
+    public static function addClient(string $name, VkClient $client): void {
         self::$clients[$name] = $client;
     }
     
@@ -97,7 +122,7 @@ final class VkClient {
      * 
      * @param string|VkClient $client
      */
-    public static function removeClient($client) {
+    public static function removeClient($client): void {
         if ($client instanceof VkClient) {
             $client = $client->getName();
         }
@@ -107,17 +132,18 @@ final class VkClient {
     /**
      *
      * @param string $client
-     * @return VkClient|string
+     * @return VkClient|null
      */
-    public static function getClient($client = self::DEFAULT_CLIENT) {
-        return self::$clients[$client] ?? $client;
+    public static function getClient(string $client = self::DEFAULT_CLIENT): ?VkClient {
+        return self::$clients[$client] ?? null;
     }
 
     /**
      *
-     * @param string $client
+     * @param string|VkClient $client
      * @return VkClient
      * @throws VkClientException if the client is not found
+     * @throws UnexpectedTypeException
      * @uses \VkLib\Method\VkMethod::call()
      * @uses \VkLib\LongPoll\LongPoll::__construct()
      * @uses \VkLib\Callback\CallbackManager::__construct()
@@ -125,13 +151,15 @@ final class VkClient {
      * @uses \VkLib\VkStreaming::__construct()
      * @uses \VkLib\Upload\Upload::__construct()
      */
-    public static function checkClient($client = self::DEFAULT_CLIENT) {
+    public static function checkClient($client = self::DEFAULT_CLIENT): VkClient {
         if($client instanceof VkClient){
             return $client;
+        } elseif (!is_string($client)) {
+            throw new UnexpectedTypeException($client, ["string", __CLASS__]);
         } elseif (self::getClient($client) instanceof VkClient) {
             return self::getClient($client);
-        } elseif (strlen($client) === 85) {
-            return (new self('tc'))->setToken($client);
+        } elseif (strlen($client) === 85) { // access token length
+            return (new self("tmp/client"))->setToken($client);
         } else {
             throw new VkClientException("client '$client' does not exist, Please create a new client for further work with the Library!");
         }
@@ -139,19 +167,21 @@ final class VkClient {
     
     /**
      * 
-     * @param HttpClient|null $client
+     * @param ClientInterface|null $client
      */
-    public function setHttpClient(?HttpClient $client = null) {
+    public function setHttpClient(?ClientInterface $client = null): void {
         $this->httpClient = $client;
     }
     
     /**
      * 
-     * @return HttpClient
+     * @return ClientInterface
      */
-    public function getHttpClient() {
-        if (!($this->httpClient instanceof HttpClient)) {
-            $this->httpClient = new BaseHttpClient();
+    public function getHttpClient(): ClientInterface {
+        if (!($this->httpClient instanceof ClientInterface)) {
+            $this->httpClient = new Client([
+                "handler" => HandlerStack::create(new StreamHandler())
+            ]);
         }
         return $this->httpClient;
     }
@@ -160,9 +190,9 @@ final class VkClient {
      * 
      * @return VkApi
      */
-    public function getApi() {
+    public function getApi(): VkApi {
         if ($this->api === null) {
-            $this->api = new VkApi($this->getName());
+            $this->api = new VkApi($this);
         }
         return $this->api;
     }
@@ -172,7 +202,7 @@ final class VkClient {
      * @param string $token
      * @return self
      */
-    public function setToken($token) {
+    public function setToken(string $token): self {
         $this->token = $token;
         return $this;
     }
@@ -181,7 +211,7 @@ final class VkClient {
      *
      * @return string
      */
-    public function getToken() {
+    public function getToken(): string {
         return $this->token;
     }
 
@@ -190,7 +220,7 @@ final class VkClient {
      * @param float $version
      * @return self
      */
-    public function setVersion($version) {
+    public function setVersion(float $version): self {
         $this->version = $version;
         return $this;
     }
@@ -199,7 +229,7 @@ final class VkClient {
      *
      * @return float
      */
-    public function getVersion() {
+    public function getVersion(): float {
         return $this->version;
     }
 
@@ -208,7 +238,7 @@ final class VkClient {
      * @param string $lang
      * @return self
      */
-    public function setLang($lang) {
+    public function setLang($lang): self {
         $this->lang = $lang;
         return $this;
     }
@@ -217,7 +247,7 @@ final class VkClient {
      *
      * @return string
      */
-    public function getLang() {
+    public function getLang(): string {
         return $this->lang;
     }
     
@@ -225,7 +255,10 @@ final class VkClient {
      * 
      * @var string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 }
+
+
+// Metalcore♡

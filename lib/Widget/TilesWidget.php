@@ -31,14 +31,14 @@ class TilesWidget extends Widget {
      * 
      * @var string
      */
-    protected $type = Widget::TYPE_TABLE;
+    protected $type = Widget::TYPE_TILES;
     
     /**
      * 
-     * @param Tile $tile
+     * @param Tile|array $tile
      */
-    public function addTile(Tile $tile) {
-        $this->body["tiles"][] = $tile->getContent();
+    public function addTile($tile) {
+        $this->body["tiles"][] = $this->getContent($tile);
         return $this;
     } 
 }

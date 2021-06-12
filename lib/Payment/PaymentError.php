@@ -41,7 +41,7 @@ class PaymentError implements PaymentResponse {
     
     /**
      * 
-     * @var string
+     * @var string|null
      */
     public $errorMsg;
     
@@ -57,7 +57,7 @@ class PaymentError implements PaymentResponse {
      * @param string $msg
      * @param bool $critical
      */
-    public function __construct($code, $msg = null, $critical = false) {
+    public function __construct(int $code, ?string $msg = null, bool $critical = false) {
         $this->errorCode = $code;
         $this->errorMsg = $msg;
         $this->critical = $critical;
@@ -68,7 +68,7 @@ class PaymentError implements PaymentResponse {
      * @param int $code
      * @return self
      */
-    public function setCode($code) {
+    public function setCode(int $code): self {
         $this->errorCode = $code;
         return $this;
     }
@@ -78,7 +78,7 @@ class PaymentError implements PaymentResponse {
      * @param string $msg
      * @return self
      */
-    public function setMessage($msg) {
+    public function setMessage(string $msg): self {
         $this->errorMsg = $msg;
         return $this;
     }
@@ -88,7 +88,7 @@ class PaymentError implements PaymentResponse {
      * @param bool $critical
      * @return self
      */
-    public function setCritical($critical = true) {
+    public function setCritical(bool $critical = true): self {
         $this->critical = $critical;
         return $this;
     }

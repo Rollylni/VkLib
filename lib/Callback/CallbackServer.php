@@ -43,7 +43,7 @@ class CallbackServer {
      * @param array $res
      * @param CallbackManager|null
      */
-    public function __construct($res, ?CallbackManager $manager = null) {
+    public function __construct(array $res, ?CallbackManager $manager = null) {
         $this->res = $res;
         $this->manager = $manager;
     }
@@ -52,7 +52,7 @@ class CallbackServer {
      * 
      * @return self
      */
-    public function update() {
+    public function update(): self {
         if ($this->getManager() instanceof CallbackManager) {
             $server = $this->getManager()->getServer($this->getId());
             if ($server instanceof CallbackServer) {
@@ -69,7 +69,7 @@ class CallbackServer {
      * @param string $new_secret_key
      * @return self
      */
-    public function edit($new_url, $new_title = false, $new_secret_key = null) {
+    public function edit(string $new_url, ?string $new_title = null, ?string $new_secret_key = null): self {
         if ($this->getManager() instanceof CallbackManager) {
             $this->getManager()->editServer($this->getId(), $new_url, $new_title, $new_secret_key);
             $this->update();
@@ -81,7 +81,7 @@ class CallbackServer {
      * 
      * @return array
      */
-    public function getSettings() {
+    public function getSettings(): array {
         if ($this->getManager() instanceof CallbackManager) {
             return $this->getManager()->getServerSettings($this->getId());
         }
@@ -93,7 +93,7 @@ class CallbackServer {
      * @param (string|int)[] $settings
      * @return self
      */
-    public function setSettings($settings) {
+    public function setSettings(array $settings): self {
         if ($this->getManager() instanceof CallbackManager) {
             $this->getManager()->setServerSettings($this->getId(), $settings);
         }
@@ -104,7 +104,7 @@ class CallbackServer {
      * 
      * @return self
      */
-    public function delete() {
+    public function delete(): self {
         if ($this->getManager() instanceof CallbackManager) {
             $this->getManager()->deleteServer($this->getId());
         }
@@ -116,7 +116,7 @@ class CallbackServer {
      * @param string $version
      * @return self
      */
-    public function setApiVersion($version) {
+    public function setApiVersion(string $version): self {
         $this->setSettings([
             "api_version" => $version
         ]);
@@ -190,7 +190,7 @@ class CallbackServer {
      * 
      * @return mixed[] 
      */
-    public function getBody() {
+    public function getBody(): array {
         return $this->res;
     }
     

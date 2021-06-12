@@ -19,31 +19,4 @@
  */
 namespace VkLib\Exception;
 
-use VkLib\Method\Error;
-
-class VkMethodException extends VkLibException {
-    
-    /**
-     *
-     * @var Error
-     */
-    public $error;
-
-    /**
-     *
-     * @param string $message
-     * @param Error $error
-     */
-    public function __construct($message, Error $error) {
-        parent::__construct($message);
-        $this->error = $error;
-    }
-
-    /**
-     *
-     * @return ApiError
-     */
-    public function getError(): Error {
-        return $this->error;
-    }
-}
+class VkOAuthException extends VkLibException {}

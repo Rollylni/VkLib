@@ -58,7 +58,7 @@ class Error {
      *
      * @return VkMethod
      */
-    public function getMethod() {
+    public function getMethod(): VkMethod {
         return $this->method;
     }
 
@@ -66,7 +66,7 @@ class Error {
      *
      * @return int|null
      */
-    public function getCode() {
+    public function getCode(): ?int {
         return $this->error["error_code"] ?? null;
     }
 
@@ -74,7 +74,7 @@ class Error {
      *
      * @return string|null
      */
-    public function getMessage() {
+    public function getMessage(): ?string {
         return $this->error["error_msg"] ?? null;
     }
 
@@ -82,7 +82,7 @@ class Error {
      *
      * @return string|null
      */
-    public function getDescription() {
+    public function getDescription(): ?string {
         return $this->error["error_desc"] ?? ($this->error["error_description"] ?? null);
     }
 
@@ -90,7 +90,7 @@ class Error {
      *
      * @return string|null
      */
-    public function getConfirmationText() {
+    public function getConfirmationText(): ?string {
         return $this->error["confirmation_text"] ?? null;
     }
 
@@ -98,7 +98,7 @@ class Error {
      *
      * @return string|null
      */
-    public function getRedirectURI() {
+    public function getRedirectURI(): ?string {
         return $this->error["redirect_uri"] ?? null;
     }
 
@@ -106,7 +106,7 @@ class Error {
      *
      * @return array|null
      */
-    public function getRequestParams() {
+    public function getRequestParams(): ?array {
         return $this->error["request_params"] ?? null;
     }
 } 

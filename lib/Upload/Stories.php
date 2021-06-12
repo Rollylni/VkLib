@@ -41,7 +41,7 @@ class Stories extends Upload {
      * @param array $params
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         $params += $this->parameters;
         if ($this->type === self::TYPE_PHOTO) {
             return $this->getClient()->getApi()->stories->getPhotoUploadServer($params)->json();
@@ -55,7 +55,7 @@ class Stories extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->stories->save($params)->json();
     }
     
@@ -73,9 +73,19 @@ class Stories extends Upload {
     
     /**
      * 
+     * @param mixed[] $params
+     * @return self
+     */
+    public function setParameters(array $params): self {
+        $this->parameters = $params;
+        return $this;
+    }
+    
+    /**
+     * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         $this->type = self::TYPE_PHOTO;
         return $this->addFile($src);
     }
@@ -84,7 +94,7 @@ class Stories extends Upload {
      * 
      * @param string $src
      */
-    public function setVideo($src) {
+    public function setVideo(string $src): self {
         $this->type = self::TYPE_VIDEO;
         return $this->addFile($src);
     }

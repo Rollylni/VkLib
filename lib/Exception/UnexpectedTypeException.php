@@ -19,31 +19,21 @@
  */
 namespace VkLib\Exception;
 
-use VkLib\Method\Error;
-
-class VkMethodException extends VkLibException {
+class UnexpectedTypeException extends \InvalidArgumentException {
     
     /**
-     *
-     * @var Error
+     * 
+     * @param mixed $value
+     * @param string|array
      */
-    public $error;
-
-    /**
-     *
-     * @param string $message
-     * @param Error $error
-     */
-    public function __construct($message, Error $error) {
-        parent::__construct($message);
-        $this->error = $error;
-    }
-
-    /**
-     *
-     * @return ApiError
-     */
-    public function getError(): Error {
-        return $this->error;
+    public function __construct($value, $expected) {
+        if (\is_array($expected)) {
+            $expected = \implode('", "', $expected);
+        }
+        
+        parent::__construct(
+            \sprintf('Expected argument of type "%s", "%s" given', 
+            $expected, (\is_object($value) ? \get_class($value) : \gettype($value))
+        ));
     }
 }

@@ -19,10 +19,11 @@
  */
 namespace VkLib;
 
-use VkLib\Exception\HttpRequestException;
 use VkLib\Exception\VkMethodException;
 use VkLib\Method\Response;
 use VkLib\Method\VkMethod;
+
+use GuzzleHttp\Promise\PromiseInterface;
 
 class VkApi {
     
@@ -55,19 +56,19 @@ class VkApi {
     /**
      * Reserved Parameters
      *
-     * @param $client
+     * @param string|VkClient $client
      */
     public function __construct($client = VkClient::DEFAULT_CLIENT) {
-        $this->addParam("access_token", $client);
+        $this->addParam(VkMethod::PARAM_TOKEN, $client);
     }
     
     /**
      * add a reserved parameter
      * 
      * @param string $param
-     * @param string $value
+     * @param mixed $value
      */
-    public function addParam($param, $value) {
+    public function addParam(string $param, $value): void {
         $this->params[$param] = $value;
     }
     
@@ -76,7 +77,7 @@ class VkApi {
      * 
      * @param string $param
      */
-    public function delParam($param) {
+    public function delParam(string $param): void {
         unset($this->params[$param]);
     }
     
@@ -84,7 +85,7 @@ class VkApi {
      * 
      * @return self
      */
-    public function clear() {
+    public function reset(): self {
         $this->section = null;
         return $this;
     }
@@ -94,7 +95,7 @@ class VkApi {
      * @param string $section
      * @return self
      */
-    public function __get(string $section) {
+    public function __get(string $section): self {
         $this->section = $section;
         return $this;
     }
@@ -102,10 +103,10 @@ class VkApi {
      /**
      *
      * @param string $method
-     * @param array $args
-     * @throws HttpRequestException
+     * @param array $args 0 => parameters (array) = [], 1 => throws (bool) = true,
+     *                    2 => timeout (float) = 0, 3 => async (callable) = false
      * @throws VkMethodException
-     * @return Response|self
+     * @return Response|PromiseInterface
      */
     public function __call(string $method, array $args) {
         if ($this->section !== null) {
@@ -114,6 +115,6 @@ class VkApi {
         $vkMethod = new VkMethod($method, $args[0] ?? []);
         foreach ($this->params as $k => $v)
             $vkMethod->parameters[$k] = $v;
-        return $vkMethod->call($args[1] ?? true);
+        return $vkMethod->call($args[1] ?? true, $args[2] ?? 0, $args[3] ?? false);
     }
 }

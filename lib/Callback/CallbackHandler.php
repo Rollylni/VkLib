@@ -22,6 +22,13 @@ namespace VkLib\Callback;
 use function method_exists;
 use function json_decode;
 use function file_get_contents;
+use function getallheaders;
+use function gmdate;
+use function header;
+use function trim;
+use function time;
+
+#assert(\PHP_SAPI !== "cli", "web-server required!");
 
 /**
  * 
@@ -34,40 +41,122 @@ abstract class CallbackHandler {
     
     /**
      * CallbackServer constructor.
+     * 
+     * @param string $token
      */
-    public function __construct() {
-        $input = $this->readData();
-        if ($input) {
-            $this->handle($input);
+    public function __construct(?string $token = null) {
+        if ($token !== null) {
+            $this->token = $token;
+        }
+        
+        if ($this->isPost()) {
+            $input = $this->readData();
+            if ($input) {
+                $this->handle($input);
+            }
         }
     }
     
     /**
      * send token for confirmation
      */
-    public function confirmation() {
-        print $this->token;
+    public function confirmation(): void {
+        $this->writeData($this->token);
     }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @param string   $type
+     * @param mixed[]  $object
+     * @param integer  $groupId
+     * @param string   $secretKey
+     * @return void
+     */
+    public function onHandle(string $type, array $object, int $groupId, ?string $secretKey): void {}
 
 
     /**
+     * Event handling
      * 
      * @param array $data
      */
-    public function handle(array $data) {
+    public function handle(array $data): void {
         $type = $data["type"] ?? null;
         $obj = $data["object"] ?? null;
         $gid = $data["group_id"] ?? null;
+        $key = $data["secret"] ?? null;
         
         if ($type === "confirmation") {
             $this->confirmation($gid);
             return;
         }
         
-        if (method_exists($this, $type)) {
-            $this->{$type}($obj, $gid);
+        //                                 // for camel case, example "newMessage"        
+        if (method_exists($this, $type) or method_exists($this, $type = trim($type, '_'))) {
+            $this->{$type}($obj, $gid, $key);
+        } 
+        
+        $this->onHandle($type, $obj, $gid, $key);
+        $this->writeData("ok");
+    }
+    
+    /**
+     * Delete Callback Server
+     * 
+     * @link https://vk.com/wall-1_397761
+     * 
+     * @since 0.7.1
+     */
+    public static function remove(): void {
+        static::writeData(__METHOD__);
+    }
+    
+    /**
+     * Repeat request later
+     * 
+     * @since 0.7.1
+     * 
+     * @param int $time in seconds, maximum 3 hours
+     */
+    public static function retryAfter(int $time = 10): void {
+        if ($time >= (60 * 60 * 3)) {
+            $time = 60 * 60 * 3;
         }
-        print "ok";
+        header("Retry-After: " . gmdate("D, d M Y H:i:s T", time() + $time), true, 503);
+    }
+    
+    /**
+     * Failed attempts
+     * 
+     * @since 0.7.1
+     * 
+     * @return int
+     */
+    public static function getRetryCounter(): int {
+        return getallheaders()["X-Retry-Counter"] ?? 0;
+    }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @return bool
+     */
+    public static function isPost(): bool {
+        return $_SERVER["REQUEST_METHOD"] === "POST";
+    }
+    
+    /**
+     * Write Response
+     * 
+     * @since 0.7.1
+     * 
+     * @param scalar $data
+     */
+    public static function writeData($data): void {
+        print $data;
     }
     
     /**

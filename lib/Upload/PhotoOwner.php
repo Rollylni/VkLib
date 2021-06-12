@@ -32,7 +32,7 @@ class PhotoOwner extends Upload {
      * @param array $params 
      * @return array
      */
-    public function getServer(array $params = []) {
+    public function getServer(array $params = []): array {
         if ($this->ownerId) {
             $params["owner_id"] = $this->ownerId;
         }
@@ -44,7 +44,7 @@ class PhotoOwner extends Upload {
      * @param array $params
      * @return array
      */
-    public function save(array $params = []) {
+    public function save(array $params = []): array {
         return $this->getClient()->getApi()->photos->saveOwnerPhoto($params)->json();
     }
     /**
@@ -62,7 +62,7 @@ class PhotoOwner extends Upload {
      * 
      * @param string|int $id
      */
-    public function setOwnerId($id) {
+    public function setOwnerId($id): self {
         $this->ownerId = $id;
         return $this;
     }
@@ -71,7 +71,7 @@ class PhotoOwner extends Upload {
      * 
      * @param string $crop
      */
-    public function setSquareCrop($crop) {
+    public function setSquareCrop(string $crop): self {
         return $this->addParam("_square_crop", $crop);
     }
     
@@ -79,7 +79,7 @@ class PhotoOwner extends Upload {
      * 
      * @param string $src
      */
-    public function setPhoto($src) {
+    public function setPhoto(string $src): self {
         return $this->addFile($src);
     }
 }

@@ -35,10 +35,10 @@ class CoverListWidget extends Widget {
     
     /**
      * 
-     * @param CoverRow $row
+     * @param CoverRow|array $row
      */
-    public function addRow(CoverRow $row) {
-        $this->body["rows"][] = $row->getContent();
+    public function addRow($row): self {
+        $this->body["rows"][] = $this->getContent($row);
         return $this;
     }
 }

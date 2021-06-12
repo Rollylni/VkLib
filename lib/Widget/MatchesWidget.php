@@ -35,10 +35,10 @@ class MatchesWidget extends Widget {
     
     /**
      * 
-     * @param Match $match
+     * @param Match|array $match
      */
-    public function addMatch(Match $match) {
-        $this->body["matches"][] = $match->getContent();
+    public function addMatch($match) {
+        $this->body["matches"][] = $this->getContent($match);
         return $this;
     }
 }

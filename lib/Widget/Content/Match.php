@@ -27,7 +27,7 @@ class Match extends Content {
      * 
      * @param string $url
      */
-    public function setLiveUrl($url) {
+    public function setLiveUrl(string $url): self {
         $this->content["live_url"] = $url;
         return $this;
     }
@@ -36,7 +36,7 @@ class Match extends Content {
      * 
      * @param string $url
      */
-    public function setUrl($url) {
+    public function setUrl(string $url): self {
         $this->content["url"] = $url;
         return $this;
     }
@@ -48,10 +48,10 @@ class Match extends Content {
      * @param string $descr
      * @param string $iconId
      */
-    public function setTeam($team, $name, $descr = null, $iconId = null) {
+    public function setTeam(string $team, string $name, ?string $descr = null, ?string $iconId = null): self {
         $team = MatchWidget::getTeam($team);
         if (!$team) {
-            return;
+            return $this;
         }
         
         $info = ["name" => $name];
@@ -68,7 +68,7 @@ class Match extends Content {
      * 
      * @param string $state
      */
-    public function setState($state) {
+    public function setState(string $state): self {
         $this->content["state"] = $state;
         return $this;
     }
@@ -78,7 +78,7 @@ class Match extends Content {
      * @param int $scoreA
      * @param int $scoreB
      */
-    public function setScore($scoreA, $scoreB) {
+    public function setScore(int $scoreA, int $scoreB): self {
         $this->content["score"] = [
             "team_a" => $scoreA,
             "team_b" => $scoreB

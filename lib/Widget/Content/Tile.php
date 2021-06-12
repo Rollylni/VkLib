@@ -25,7 +25,7 @@ class Tile extends Content {
      * 
      * @param string $title
      */
-    public function setTitle($title) {
+    public function setTitle(string $title): self {
         $this->content["title"] = $title;
         return $this;
     }
@@ -34,7 +34,7 @@ class Tile extends Content {
      * 
      * @param string $url
      */
-    public function setUrl($url) {
+    public function setUrl(string $url): self {
         $this->content["url"] = $url;
         return $this;
     }
@@ -43,7 +43,7 @@ class Tile extends Content {
      * 
      * @param string $text
      */
-    public function setLink($text) {
+    public function setLink(string $text): self {
         $this->content["link"] = $text;
         return $this;
     }
@@ -52,7 +52,7 @@ class Tile extends Content {
      * 
      * @param string $url
      */
-    public function setLinkUrl($url) {
+    public function setLinkUrl(string $url): self {
         $this->content["link_url"] = $url;
         return $this;
     }
@@ -61,7 +61,7 @@ class Tile extends Content {
      * 
      * @param string $id
      */
-    public function setIconId($id) {
+    public function setIconId(string $id): self {
         $this->content["icon_id"] = $id;
         return $this;
     }
@@ -70,7 +70,7 @@ class Tile extends Content {
      * 
      * @param string $descr
      */
-    public function setDescr($descr) {
+    public function setDescr(string $descr): self {
         $this->content["descr"] = $descr;
         return $this;
     }

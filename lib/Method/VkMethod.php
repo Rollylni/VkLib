@@ -19,20 +19,26 @@
  */
 namespace VkLib\Method;
 
-use VkLib\Exception\HttpRequestException;
 use VkLib\Exception\VkClientException;
 use VkLib\Exception\VkMethodException;
 use VkLib\VkClient;
 use VkLib\VkApi;
 
+use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Promise\PromiseInterface;
+
+use function json_decode;
 use function strtolower;
 use function ctype_upper;
 use function substr;
 use function strlen;
+use function is_callable;
 use function is_array;
 use function is_bool;
 use function implode;
 use function intval;
+
 use const PHP_EOL;
 
 /**
@@ -51,10 +57,11 @@ class VkMethod {
     public const PARAM_LANG = "lang";
     public const PARAM_TOKEN = "access_token";
     public const PARAM_VERSION = "v";
+    public const PARAM_TEST_MODE = "test_mode";
     
     /**
      * 
-     * @var string 
+     * @var string|null
      */
     private $method = null;
     
@@ -66,10 +73,10 @@ class VkMethod {
     
     /**
      * 
-     * @param string $method
+     * @param string|null $method
      * @param mixed[] $params
      */
-    public function __construct($method = null, array $params = []) {
+    public function __construct(?string $method = null, array $params = []) {
         $this->method = $method;
         $this->parameters = $params;
     }
@@ -81,7 +88,7 @@ class VkMethod {
      * @see VkMethod::formatParameter()
      * @return self
      */
-    public function __call($method, $args) {
+    public function __call(string $method, array $args): self {
         if (substr($method, 0, 3) === "set") {
             $param = $this->formatParameter(substr($method, 3));
             $this->setParameter($param, $args[0] ?? null);
@@ -94,22 +101,24 @@ class VkMethod {
      * @param string $key
      * @param mixed $value
      */
-    public function __set($key, $value) {
+    public function __set(string $key, $value) {
         $this->setParameter($key, $value);
     }
     
     /**
      * 
      * @param bool $throws
-     * @throws HttpRequestException - maybe
+     * @param float $timeout
+     * @param callable $async
+     * @throws RequestException
      * @throws VkClientException
      * @throws VkMethodException
      * @see VkMethod::convertParameters()
      * @see VkClient::checkClient()
      * @see Captcha::handle()
-     * @return Response
+     * @return Response|PromiseInterface
      */
-    public function call(bool $throws = true) {
+    public function call(bool $throws = true, float $timeout = 0, $async = false) {
         $this->parameters[self::PARAM_TOKEN] = $this->parameters[self::PARAM_TOKEN] ?? static::$client;
         $client = VkClient::checkClient($this->parameters[self::PARAM_TOKEN]);
 
@@ -118,17 +127,43 @@ class VkMethod {
         $this->parameters[self::PARAM_TOKEN] = $client->getToken();
         $this->parameters = $this->convertParameters($this->parameters);
         
-        $response = $client->getHttpClient()->postRequest(VkApi::ENDPOINT . $this->method, [
-            "form_params" => $this->parameters
-        ]);
-        $response = new Response($this, $response);
-        $error = $response->getError();
+        $url = VkApi::ENDPOINT . $this->method;
+        $options = [
+            "form_params" => $this->parameters,
+            "http_errors" => $throws,
+            "timeout" => $timeout
+        ];
         
-        if ($error && (($captcha = $error->getCaptcha()) instanceof Captcha)) {
-            Captcha::handle($captcha);
+        if (is_callable($async)) {
+            return $client->getHttpClient()->postAsync($url, $options)->then(
+                function(ResponseInterface $res) use($async) {
+                    $async($this->handleResponse(self::JSON($res), false));
+                }
+            );
         }
         
-        if ($throws && $error) {
+         return $this->handleResponse(self::JSON($client->getHttpClient()->post($url, $options)), $throws);
+    }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @param array $response
+     * @param bool $throws
+     * @throws VkMethodException
+     * @return Response
+     */
+    public function handleResponse(array $response, bool $throws = true): Response {
+        $response = new Response($this, $response);
+        $error = $response->getError();
+        $handled = false;
+        
+        if ($error && (($captcha = $error->getCaptcha()) instanceof Captcha)) {
+            $handled = Captcha::handle($captcha);
+        }
+        
+        if ($throws && $error && !$handled) {
             $error_msg = "Method " .$this->getMethod(). " failed: " .$error->getMessage(). " (" .$error->getCode(). ")";
             if ($error->getDescription()) {
                 $error_msg .= ", ".$error->getDescription();
@@ -147,8 +182,22 @@ class VkMethod {
      * @param string $key
      * @return mixed
      */
-    public function __get($key) {
+    public function __get(string $key) {
         return $this->getParameter($key);
+    }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @param string|ResponseInterface $res
+     * @return mixed[]
+     */
+    public static function JSON($res): array {
+        if ($res instanceof ResponseInterface) {
+            $res = $res->getBody();
+        }
+        return json_decode($res, true) ?? [];
     }
     
     /**
@@ -156,7 +205,7 @@ class VkMethod {
      * @param string $param
      * @return string Formatted parameter
      */
-    public static function formatParameter($param) {
+    public static function formatParameter(string $param): string {
         $length = strlen($param);
         $str = "";
         for ($offset = 0; $offset < $length; $offset++) {
@@ -182,7 +231,7 @@ class VkMethod {
      * @uses VkMethod::call()
      * @return (string|int)[]
      */
-    public static function convertParameters(array $params) {
+    public static function convertParameters(array $params): array {
         foreach ($params as $k => $v) {
             if (is_array($v)) {
                 $params[$k] = implode(",", $v);
@@ -198,8 +247,20 @@ class VkMethod {
      * @param string $method
      * @return self
      */
-    public function setMethod($method) {
+    public function setMethod(string $method): self {
         $this->method = $method;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @since 0.7.1
+     * 
+     * @param string $client
+     * @return self
+     */
+    public function setClient(string $client): self {
+        $this->setAccessToken($client);
         return $this;
     }
     
@@ -216,7 +277,7 @@ class VkMethod {
      * @param array $params
      * @return self
      */
-    public function setParameters(array $params = []) {
+    public function setParameters(array $params = []): self {
         $this->parameters = $params;
         return $this;
     }
@@ -235,7 +296,7 @@ class VkMethod {
      * @param mixed $value
      * @return self
      */
-    public function setParameter($key, $value) {
+    public function setParameter(string $key, $value): self {
         $this->parameters[$key] = $value;
         return $this;
     }
@@ -245,7 +306,7 @@ class VkMethod {
      * @param string $key
      * @return mixed
      */
-    public function getParameter($key) {
+    public function getParameter(string $key) {
         return $this->parameters[$key] ?? null;
     }
 }

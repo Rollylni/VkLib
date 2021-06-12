@@ -41,9 +41,9 @@ class CallbackManager {
     /**
      * 
      * @param int $gid Group Id
-     * @param $client Group Token or Admin Token
+     * @param string|VkClient $client Group Token or Admin Token
      */
-    public function __construct($gid, $client = VkClient::DEFAULT_CLIENT) {
+    public function __construct(int $gid, $client = VkClient::DEFAULT_CLIENT) {
         $this->api = clone VkClient::checkClient($client)->getApi();
         $this->api->addParam("group_id", $gid);
     }
@@ -53,8 +53,9 @@ class CallbackManager {
      * @param string $url
      * @param string $title
      * @param string $secret
+     * @return int|null
      */
-    public function addServer($url, $title = false, $secret = null) {
+    public function addServer(string $url, ?string $title = null, ?string $secret = null): ?int {
         if (!$title) {
             $servers = $this->getServersCount();
             $title = "Server ".($servers + 1);
@@ -68,14 +69,14 @@ class CallbackManager {
         if ($secret) {
             $params["secret_key"] = $secret;
         }
-        $this->getApi()->groups->addCallbackServer($params);
+        return $this->getApi()->groups->addCallbackServer($params)->getServerId();
     }
     
     /**
      * 
      * @param string|int $id Title or Id
      */
-    public function deleteServer($id) {
+    public function deleteServer($id): void {
         $server = $this->getServer($id);
         if ($server instanceof CallbackServer) {
             $this->getApi()->groups->deleteCallbackServer([
@@ -91,10 +92,10 @@ class CallbackManager {
      * @param string $new_title
      * @param string $new_secret_key
      */
-    public function editServer($id, $new_url, $new_title = false, $new_secret_key = null) {
+    public function editServer($id, string $new_url, ?string $new_title = null, ?string $new_secret_key = null): void {
         $server = $this->getServer($id);
         if (!($server instanceof CallbackServer)) {
-            return false;
+            return;
         }
         
         if (!$new_title) {
@@ -118,7 +119,7 @@ class CallbackManager {
      * @param string|int $id
      * @param (string|int)[] $settings
      */
-    public function setServerSettings($id, $settings) {
+    public function setServerSettings($id, array $settings): void {
         $server = $this->getServer($id);
         if ($server instanceof CallbackServer) {
             $settings["server_id"] = $server->getId();
@@ -131,7 +132,7 @@ class CallbackManager {
      * @param string|int $id
      * @return array
      */
-    public function getServerSettings($id) {
+    public function getServerSettings($id): array {
         $server = $this->getServer($id);
         if ($server === null) return [];
         return $this->getApi()->groups->getCallbackSettings([
@@ -143,7 +144,7 @@ class CallbackManager {
      * 
      * @return CallbackServer|null
      */
-    public function getLastServer() {
+    public function getLastServer(): ?CallbackServer {
         $servers = $this->getServers();
         $index = count($servers) - 1;
         return $servers[$index] ?? null;
@@ -154,7 +155,7 @@ class CallbackManager {
      * @param string|int $id
      * @return CallbackServer|null
      */
-    public function getServer($id) {
+    public function getServer($id): ?CallbackServer {
         $mode = "getTitle";
         if (is_int($id)) {
             $mode = "getId";
@@ -169,7 +170,7 @@ class CallbackManager {
      * @param mixed $q
      * @return (CallbackServer|array)[]
      */
-    public function getServers($items = false, $mode = false, $q = false) {
+    public function getServers(bool $items = false, ?string $mode = null, $q = null): array {
         $res = $this->getApi()->groups->getCallbackServers()->json();
         if (!isset($res["items"])) return [];
         if ($items) {
@@ -179,7 +180,7 @@ class CallbackManager {
         $servers = [];
         foreach ($res["items"] as $item) {
             $server = new CallbackServer($item, $this);
-            if ($mode !== false and $q !== false) {
+            if ($mode !== null and $q !== null) {
                 if (method_exists($server, $mode)) {
                     if ($server->{$mode}() === $q) {
                         $servers[] = $server;
@@ -196,7 +197,7 @@ class CallbackManager {
      * 
      * @return int
      */
-    public function getServersCount() {
+    public function getServersCount(): int {
         return $this->getApi()->groups->getCallbackServers()->json()["count"] ?? 0;
     }
     
@@ -204,7 +205,7 @@ class CallbackManager {
      * 
      * @return string|null
      */
-    public function getConfirmationCode() {
+    public function getConfirmationCode(): ?string {
         return $this->getApi()->groups->getCallbackConfirmationCode()->json()["code"] ?? null;
     }
     
@@ -212,7 +213,7 @@ class CallbackManager {
      * 
      * @return VkApi
      */
-    public function getApi() {
+    public function getApi(): VkApi {
         return $this->api;
     }
 }

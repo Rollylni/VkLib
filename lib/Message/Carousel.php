@@ -20,6 +20,7 @@
 namespace VkLib\Message;
 
 use function json_encode;
+use function array_slice;
 
 /**
  * 
@@ -29,26 +30,33 @@ class Carousel implements Template {
     
     /**
      * 
-     * @var array
+     * @var array[]
      */
     public $elements = [];
     
     public const ACTION_OPEN_PHOTO = "open_photo";
     public const ACTION_OPEN_LINK = "open_link";
     
+    public const MAX_CAROUSEL_ELEMENTS = 10;
+    public const MAX_ELEMENT_BUTTONS = 3;
+    
     /**
      * 
-     * @param Keyboard $kb
+     * @param Button[] $buttons
      * @param string $photoId
      * @param string $title
      * @param string $description
      * @param string $action
      * @param string $link
      */
-    public function addElement(Keyboard $kb, $photoId = null, $title = null, $description = null, 
-        $action = self::ACTION_OPEN_PHOTO, $link = null) {
+    public function addElement(array $buttons, ?string $photoId = null, ?string $title = null, 
+                    ?string $description = null, string $action = self::ACTION_OPEN_PHOTO, ?string $link = null): void {
         $body = [];
-        $body["buttons"] = $kb->getBody(false, false)["buttons"];
+        $body["buttons"] = array_slice($buttons, 0, self::MAX_ELEMENT_BUTTONS);
+        foreach ($body["buttons"] as $k => $button) {
+            $body["buttons"][$k] = $button->getBody(false);
+        }
+        
         if ($photoId !== null) {
             $body["photo_id"] = $photoId;
         } if ($title !== null) {
@@ -56,7 +64,7 @@ class Carousel implements Template {
             $body["description"] = $description;
         }
         $act = ["type" => $action];
-        if ($act === self::ACTION_OPEN_LINK) {
+        if ($action === self::ACTION_OPEN_LINK) {
             $act["link"] = $link;
         }
         $body["action"] = $act;
@@ -68,10 +76,10 @@ class Carousel implements Template {
      * @param bool $json
      * @return array|string
      */
-    public function getBody($json = true) {
+    public function getBody(bool $json = true) {
         $body = [
             "type" => Template::CAROUSEL,
-            "elements" => $this->elements
+            "elements" => array_slice($this->elements, 0, self::MAX_CAROUSEL_ELEMENTS)
         ];
         
         if ($json) {
@@ -84,7 +92,7 @@ class Carousel implements Template {
      * 
      * @return array
      */
-    public function getElements() {
+    public function getElements(): array {
         return $this->elements;
     }
 }
