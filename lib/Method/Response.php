@@ -111,9 +111,9 @@ class Response {
     /**
      * 
      * @param bool $resp
-     * @return array
+     * @return mixed
      */
-    public function json(bool $resp = true): array {
+    public function json(bool $resp = true) {
         if (isset($this->data["response"]) && $resp) {
             return $this->data["response"];
         }
