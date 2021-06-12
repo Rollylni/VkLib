@@ -101,7 +101,7 @@ $lp->start();
 
 # Carousel
 
-  * [Read Keyboard First](# Keyboard)
+  * [Read Keyboard First](#Keyboard)
 
 ## Example
 ```php
