@@ -6,10 +6,6 @@
 ```php
 use VkLib\Callback\CallbackHandler;
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    return;
-}
-
 new class extends CallbackHandler {
     public $token = "Confirmation Key";
     
