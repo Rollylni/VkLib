@@ -1,8 +1,8 @@
 # Long Poll Bots/User
 
   * [Read Clients Managing First](./Clients.md)
-  * [Bots](##Bots)
-  * [User](##User)
+  * [Bots](#Bots)
+  * [User](#User)
 
 ## Bots
 
