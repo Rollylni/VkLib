@@ -15,7 +15,7 @@ composer require rollylni/vklib
 ## Capabilities
   * Ability to create many clients [(Example)](./docs/Clients.md)
   * Сonvenient call API requests [(Example)](./docs/Methods.md)
-  * Captcha handling capability [(Example)](./docs/Methods.md)
+  * Captcha handling capability [(Example)](.docs/Methods.md)
   * Keyboard support for bots [(Example)](./docs/Keyboard.md)
   * Callback buttons supported [(Example)](./docs/Keyboard.md)
   * Button click handlers for bots [(Example)](./docs/Keyboard.md)
@@ -26,9 +26,11 @@ composer require rollylni/vklib
   * Manage group callback servers [(Example)](./docs/CallbackManager.md)
   * The ability to process payments [(Example)](./docs/Payment.md)
   * Uploading files [(Example)](./docs/Upload.md)
+  * Execute util [(Example)](./docs/Execute.md)
   * Streaming [(Example)](./docs/Streaming.md)
   * Widgets [(Example)](./docs/Widgets.md)
   * OAuth [(Example)](./docs/OAuth.md)
+  * Foaf [(Example)](./docs/Foaf.md)
   
 ## Example Usage
 ```php
