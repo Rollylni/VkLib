@@ -32,7 +32,7 @@ class VkApi {
      * @link https://vk.com/dev/versions
      * @var float
      */
-    public const CURRENT_VERSION = 5.130;
+    public const CURRENT_VERSION = 5.131;
 
     /**
      *
@@ -48,13 +48,13 @@ class VkApi {
     public $section = null;
     
     /**
+     * Reserved Parameters
      * 
      * @var string[]
      */
     public $params = [];
     
     /**
-     * Reserved Parameters
      *
      * @param string|VkClient $client
      */
