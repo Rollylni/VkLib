@@ -106,7 +106,7 @@ final class VkClient {
      */
     public function rename(string $name): void {
         $this->remove();
-        $this->addClient($name, $this)
+        $this->addClient($name, $this);
     }
     
     /**
