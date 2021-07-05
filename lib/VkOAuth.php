@@ -157,7 +157,7 @@ class VkOAuth {
      */
     public function __construct(int $appId = null, string $appSecret = null) {
         $this->clientId = $appId;
-        $this->clientSecret $appSecret;
+        $this->clientSecret = $appSecret;
     }
     
     /**
@@ -282,7 +282,7 @@ class VkOAuth {
      * @return mixed[] [access_token, user_id, expires_in]
      */
     public function getMobileToken(array $params = [], bool $throws = true): array {
-        if (isset($params["scope"] && is_array($params["scope"])) {
+        if (isset($params["scope"]) && is_array($params["scope"])) {
             $params["scope"] = implode(',', $params["scope"]);
         } if ($throws && (!isset($params["username"]) || !isset($params["password"]))) {
             throw new VkOAuthException("Authorization failed: username and password required!");
@@ -303,7 +303,7 @@ class VkOAuth {
             $params["client_id"] = $this->getClientId();
         } if (!isset($params["redirect_uri"])) {
             $params["redirect_uri"] = $this->getRedirectUri();
-        } if (isset($params["scope"] && is_array($params["scope"])) {
+        } if (isset($params["scope"]) && is_array($params["scope"])) {
             $params["scope"] = implode(',', $params["scope"]);
         } if (isset($params["group_ids"]) && is_array($params["group_ids"])) {
             $params["group_ids"] = implode(',', $params["group_ids"]);
