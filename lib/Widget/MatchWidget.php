@@ -42,7 +42,7 @@ class MatchWidget extends Widget {
     public function addEvent(string $team, string $event, int $minute): self {
         $team = $this->getTeam($team);
         if (!$team) {
-            return;
+            return $this;
         }
         $this->body["match"]["events"][$team] = [
             "event" => $event,
@@ -61,7 +61,7 @@ class MatchWidget extends Widget {
     public function setTeam(string $team, string $name, ?string $descr = null, ?string $iconId = null): self {
         $team = $this->getTeam($team);
         if (!$team) {
-            return;
+            return $this;
         }
         
         $info = ["name" => $name];
