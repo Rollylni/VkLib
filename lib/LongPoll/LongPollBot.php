@@ -65,7 +65,7 @@ class LongPollBot extends LongPoll {
      * 
      * @param bool $handle
      */
-    public function setHandling(bool $handle = true): void {
+    public function setHandling(bool $handle = true): self {
         $this->payloadHandling[0] = $handle;
         if (!$this->payloadHandling[1] && $handle) {
             Keyboard::setLongPoll($this);
